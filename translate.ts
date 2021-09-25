@@ -10,7 +10,7 @@ import { Assembly } from './types.ts'
 ///            0.1.2-5c3bfd4b*/.-/clang/int
 ///            0.1.1-6ff4cd6b/RelWithDebInfo-Emscripten/clang/int
 /// New style: 0.4.5+commit.b318366e.Emscripten.clang
-function versionToSemver(version: string) {
+export function versionToSemver(version: string) {
   // FIXME: parse more detail, but this is a good start
   const parsed = version.match(/^([0-9]+\.[0-9]+\.[0-9]+)-([0-9a-f]{8})[/*].*$/)
   if (parsed) {
@@ -38,8 +38,7 @@ function translateErrors(
 ) {
   for (const error in errors) {
     let type = 'error'
-    let extractType = /^(.*):(\d+):(\d+):(.*):/
-    extractType = extractType.exec(errors[error])
+    const extractType = /^(.*):(\d+):(\d+):(.*):/.exec(errors[error])
     if (extractType) {
       type = extractType[4].trim()
     } else if (errors[error].indexOf(': Warning:')) {
@@ -73,7 +72,7 @@ function translateGasEstimates(gasEstimates: null | number | Record<string, any>
   return gasEstimatesTranslated
 }
 
-function translateJsonCompilerOutput(
+export function translateJsonCompilerOutput(
   output: {
     error: any
     errors: any
@@ -206,6 +205,6 @@ function formatAssemblyText(asm: Assembly, prefix: string, source: string | unde
   return text
 }
 
-function prettyPrintLegacyAssemblyJSON(assembly: Assembly, source: string) {
+export function prettyPrintLegacyAssemblyJSON(assembly: Assembly, source: string) {
   return formatAssemblyText(assembly, '', source)
 }

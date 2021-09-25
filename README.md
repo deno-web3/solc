@@ -2,7 +2,7 @@
 
 > ⚠️ Highly experimental!
 
-Solidity compiler bindings for Deno.
+Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
 ## Example
 
@@ -25,11 +25,11 @@ const input = {
   }
 }
 
-const output = JSON.parse(solc.compile(JSON.stringify(input)))
+const { contracts } = JSON.parse(solc.compile(JSON.stringify(input)))
 
 // `output` here contains the JSON output as specified in the documentation
-for (const contractName in output.contracts['test.sol']) {
-  console.log(contractName + ': ' + output.contracts['test.sol'][contractName].evm.bytecode.object)
+for (const contractName in contracts['test.sol']) {
+  console.log(`${contractName}: ${contracts['test.sol'][contractName].evm.bytecode.object}`)
 }
 ```
 
