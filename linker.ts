@@ -1,4 +1,5 @@
-import { assert, keccak256 } from './deps.ts'
+import { keccak256 } from './deps.ts'
+import { assert } from './utils.ts'
 
 function libraryHashPlaceholder(input: string) {
   return '$' + keccak256(input).slice(0, 34) + '$'

@@ -1,8 +1,20 @@
-import { assert, semver } from './deps.ts'
+import { semver } from './deps.ts'
+import { assert } from './utils.ts'
 import * as translate from './translate.ts'
 
-export const setupMethods = (soljson) => {
-  let version
+export const setupMethods = (soljson: {
+  cwrap: (arg0?: any, arg1?: any, arg2?: any[]) => (arg0?: any, arg1?: any) => any
+  _malloc: any
+  lengthBytesUTF8: (arg0: string) => any
+  stringToUTF8: (arg0: string, arg1: any, arg2: any) => void
+  setValue: (arg0: any, arg1: any, arg2: string) => void
+  UTF8ToString: any
+  Pointer_stringify: any
+  addFunction: any
+  Runtime: { addFunction: any; removeFunction: any }
+  removeFunction: any
+}) => {
+  let version: () => string
   if ('_solidity_version' in soljson) {
     version = soljson.cwrap('solidity_version', 'string', [])
   } else {
@@ -25,7 +37,7 @@ export const setupMethods = (soljson) => {
     }
   }
 
-  let alloc
+  let alloc: (x: number) => any
   if ('_solidity_alloc' in soljson) {
     alloc = soljson.cwrap('solidity_alloc', 'number', ['number'])
   } else {
@@ -33,12 +45,12 @@ export const setupMethods = (soljson) => {
     assert(alloc, 'Expected malloc to be present.')
   }
 
-  let reset
+  let reset: () => void
   if ('_solidity_reset' in soljson) {
     reset = soljson.cwrap('solidity_reset', null, [])
   }
 
-  const copyToCString = (str, ptr) => {
+  const copyToCString = (str: string, ptr: any) => {
     const length = soljson.lengthBytesUTF8(str)
     // This is allocating memory using solc's allocator.
     //
@@ -57,9 +69,9 @@ export const setupMethods = (soljson) => {
   // Take a single `ptr` and returns a `str`.
   const copyFromCString = soljson.UTF8ToString || soljson.Pointer_stringify
 
-  const wrapCallback = (callback) => {
+  const wrapCallback = (callback: (arg0: any) => any) => {
     assert(typeof callback === 'function', 'Invalid callback specified.')
-    return (data, contents, error) => {
+    return (data: any, contents: any, error: any) => {
       const result = callback(copyFromCString(data))
       if (typeof result.contents === 'string') {
         copyToCString(result.contents, contents)
@@ -70,9 +82,12 @@ export const setupMethods = (soljson) => {
     }
   }
 
-  const wrapCallbackWithKind = (callback) => {
+  const wrapCallbackWithKind = (callback: {
+    (kind: 'source' | 'smt-query', data: any): any
+    (arg0: any, arg1: any): any
+  }) => {
     assert(typeof callback === 'function', 'Invalid callback specified.')
-    return (context, kind, data, contents, error) => {
+    return (context: number, kind: any, data: any, contents: any, error: any) => {
       // Must be a null pointer.
       assert(context === 0, 'Callback context must be null.')
       const result = callback(copyFromCString(kind), copyFromCString(data))
@@ -86,7 +101,11 @@ export const setupMethods = (soljson) => {
   }
 
   // This calls compile() with args || cb
-  const runWithCallbacks = (callbacks, compile, args) => {
+  const runWithCallbacks = (
+    callbacks: Record<string, any>,
+    compile: { apply: (arg0: undefined, arg1: any) => any },
+    args: any[]
+  ) => {
     if (callbacks) {
       assert(typeof callbacks === 'object', 'Invalid callback object specified.')
     } else {
@@ -95,7 +114,7 @@ export const setupMethods = (soljson) => {
 
     let readCallback = callbacks.import
     if (readCallback === undefined) {
-      readCallback = (data) => ({
+      readCallback = () => ({
         error: 'File import callback not supported'
       })
     }
@@ -105,12 +124,12 @@ export const setupMethods = (soljson) => {
       // After 0.6.x multiple kind of callbacks are supported.
       let smtSolverCallback = callbacks.smtSolver
       if (smtSolverCallback === undefined) {
-        smtSolverCallback = (data) => ({
+        smtSolverCallback = () => ({
           error: 'SMT solver callback not supported'
         })
       }
 
-      singleCallback = (kind, data) => {
+      singleCallback = (kind: 'source' | 'smt-query', data: any) => {
         if (kind === 'source') {
           return readCallback(data)
         } else if (kind === 'smt-query') {
@@ -155,19 +174,22 @@ export const setupMethods = (soljson) => {
     return output
   }
 
-  let compileJSON = null
+  let compileJSON: ((arg0: any, arg1: any) => any) | null = null
   if ('_compileJSON' in soljson) {
     // input (text), optimize (bool) -> output (jsontext)
     compileJSON = soljson.cwrap('compileJSON', 'string', ['string', 'number'])
   }
 
-  let compileJSONMulti = null
+  let compileJSONMulti: ((arg0: string, arg1: any) => any) | null = null
   if ('_compileJSONMulti' in soljson) {
     // input (jsontext), optimize (bool) -> output (jsontext)
     compileJSONMulti = soljson.cwrap('compileJSONMulti', 'string', ['string', 'number'])
   }
 
-  let compileJSONCallback = null
+  let compileJSONCallback: {
+    (arg0: string, arg1: any, arg2: any): any
+    (input: any, optimize: any, readCallback: any): any
+  } | null = null
   if ('_compileJSONCallback' in soljson) {
     // input (jsontext), optimize (bool), callback (ptr) -> output (jsontext)
     const compileInternal = soljson.cwrap('compileJSONCallback', 'string', ['string', 'number', 'number'])
@@ -175,14 +197,18 @@ export const setupMethods = (soljson) => {
       runWithCallbacks(readCallback, compileInternal, [input, optimize])
   }
 
-  let compileStandard = null
+  let compileStandard: {
+    (arg0: any, arg1: any): any
+    (input: any, readCallback: any): any
+    (input: any, callbacks: any): any
+  } | null = null
   if ('_compileStandard' in soljson) {
     // input (jsontext), callback (ptr) -> output (jsontext)
     const compileStandardInternal = soljson.cwrap('compileStandard', 'string', ['string', 'number'])
     compileStandard = (input, readCallback) => runWithCallbacks(readCallback, compileStandardInternal, [input])
   }
   if ('_solidity_compile' in soljson) {
-    let solidityCompile
+    let solidityCompile: any
     if (isVersion6) {
       // input (jsontext), callback (ptr), callback_context (ptr) -> output (jsontext)
       solidityCompile = soljson.cwrap('solidity_compile', 'string', ['string', 'number', 'number'])
@@ -194,12 +220,12 @@ export const setupMethods = (soljson) => {
   }
 
   // Expects a Standard JSON I/O but supports old compilers
-  const compileStandardWrapper = (input, readCallback) => {
+  const compileStandardWrapper = (input: any, readCallback: any) => {
     if (compileStandard !== null) {
       return compileStandard(input, readCallback)
     }
 
-    function formatFatalError(message) {
+    function formatFatalError(message: string) {
       return JSON.stringify({
         errors: [
           {
@@ -225,11 +251,11 @@ export const setupMethods = (soljson) => {
     if (input['sources'] == null || input['sources'].length === 0)
       return formatFatalError('No input sources specified.')
 
-    const isOptimizerEnabled = (input) =>
+    const isOptimizerEnabled = (input: { [x: string]: { [x: string]: { [x: string]: any } } }) =>
       input['settings'] && input['settings']['optimizer'] && input['settings']['optimizer']['enabled']
 
-    function translateSources(input) {
-      const sources = {}
+    function translateSources(input: { [x: string]: { [x: string]: { [x: string]: any } } }) {
+      const sources: Record<string, any> = {}
       for (const source in input['sources']) {
         if (input['sources'][source]['content'] !== null) {
           sources[source] = input['sources'][source]['content']
@@ -241,13 +267,13 @@ export const setupMethods = (soljson) => {
       return sources
     }
 
-    function librariesSupplied(input) {
+    function librariesSupplied(input: { [x: string]: { [x: string]: any } }) {
       if (input['settings']) {
         return input['settings']['libraries']
       }
     }
 
-    function translateOutput(output, libraries) {
+    function translateOutput(output: any, libraries: Record<string, any>) {
       try {
         output = JSON.parse(output)
       } catch (e) {
