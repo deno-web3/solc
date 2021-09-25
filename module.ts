@@ -16,4 +16,4 @@ process.versions = { node: '12.4.0' }
 // @ts-ignore
 globalThis.process = process
 
-export const soljson = require('./soljson-v0.8.7+commit.e28d00a7.js')
+export const soljson = require('./soljson-v0.8.7+commit.e28d00a7.min.js')
