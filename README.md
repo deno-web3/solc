@@ -10,7 +10,7 @@
 
 > ⚠️ Highly experimental!
 
-Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
+Solidity bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
 ## Docs
 
