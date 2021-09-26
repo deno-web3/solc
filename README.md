@@ -50,10 +50,6 @@ And then run with
 deno run -A --unstable --no-check mod.js
 ```
 
-## TODO
-
-- `solc/download.ts` to download a specific solidity version
-
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-libs/solc?style=for-the-badge&color=black&
 [code-quality]: https://www.codefactor.io/repository/github/deno-libs/solc
 [nest-badge]: https://img.shields.io/badge/publushed%20on-nest.land-black?style=for-the-badge
