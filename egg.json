@@ -1,0 +1,21 @@
+{
+  "$schema": "https://x.nest.land/eggs@0.3.8/src/schema.json",
+  "name": "solc",
+  "entry": "./mod.ts",
+  "description": "💎 Solidity v0.8.7 bindings for Deno",
+  "homepage": "https://github.com/deno-libs/solc",
+  "version": "0.0.2",
+  "releaseType": null,
+  "unstable": false,
+  "unlisted": false,
+  "files": [
+    "README.md",
+    "*.ts",
+    "LICENSE"
+  ],
+  "ignore": [],
+  "checkFormat": false,
+  "checkTests": false,
+  "checkInstallation": true,
+  "check": true
+}
