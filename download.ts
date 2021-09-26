@@ -1,6 +1,6 @@
 import { readerFromStreamReader, copy } from './deps.ts'
 
-export const download = async (version?: string) => {
+export const download = async (path: string, version?: string) => {
   console.log(`Fetching releases...`)
   const { releases, latestRelease } = await fetch('https://solc-bin.ethereum.org/bin/list.json').then((res) =>
     res.json()
@@ -16,8 +16,8 @@ export const download = async (version?: string) => {
 
   if (rdr) {
     const r = readerFromStreamReader(rdr)
-    await Deno.mkdir(`${Deno.cwd()}/.cache`)
-    const f = await Deno.open(`${Deno.cwd()}/.cache/soljson.js`, { create: true, write: true })
+    await Deno.mkdir(path)
+    const f = await Deno.open(path, { create: true, write: true })
     await copy(r, f)
     f.close()
   }

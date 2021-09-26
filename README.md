@@ -12,8 +12,6 @@
 
 Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
-Running solc for the first time will download soljson file to `.cache/soljson.js`.
-
 ## Docs
 
 See [solc-js README](https://github.com/ethereum/solc-js#readme).
@@ -21,7 +19,12 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme).
 ## Example
 
 ```ts
-import { solc } from 'https://x.nest.land/solc@0.0.4/mod.ts'
+import { setupSolc } from 'https://deno.land/x/solc/mod.ts'
+import { download } from 'https://deno.land/x/solc/download.ts'
+
+await download('./soljson.js') // download soljson
+
+const solc = setupSolc('./soljson.js') // require(...) soljson to Deno
 
 const input = {
   sources: {
