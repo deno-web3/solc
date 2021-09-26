@@ -1,5 +1,5 @@
 import * as linker from './linker.ts'
-import { Assembly } from './types.ts'
+import type { Assembly, GasEstimates, Output } from './types.ts'
 
 /// Translate old style version numbers to semver.
 /// Old style: 0.3.6-3fc68da5/Release-Emscripten/clang
@@ -72,96 +72,70 @@ function translateGasEstimates(gasEstimates: null | number | Record<string, any>
   return gasEstimatesTranslated
 }
 
-export function translateJsonCompilerOutput(
-  output: {
-    error: any
-    errors: any
-    contracts: Record<string, any>
-    sourceList: Record<string, any>
-    sources: Record<string, any>
-  },
-  libraries: Record<string, any>
-) {
+export function translateJsonCompilerOutput(output: Output, libraries: Record<string, any>) {
   const ret: { errors: any[]; contracts: Record<string, any>; sources: Record<string, any> } = {
     errors: [],
     contracts: {},
     sources: {}
   }
 
-  let errors
-  if (output['error']) {
-    errors = [output['error']]
-  } else {
-    errors = output['errors']
-  }
-  translateErrors(ret['errors'], errors)
+  const errors = output.error ? [output.error] : output.errors
 
-  for (const contract in output['contracts']) {
+  translateErrors(ret.errors, errors)
+
+  for (const contract in output.contracts) {
     // Split name first, can be `contract`, `:contract` or `filename:contract`
     const tmp = contract.match(/^(([^:]*):)?([^:]+)$/)
     if (tmp?.length !== 4) {
       // Force abort
       return null
     }
-    let fileName = tmp[2]
-    if (fileName === undefined) {
-      // this is the case of `contract`
-      fileName = ''
-    }
+    const fileName = tmp[2] || ''
+
     const contractName = tmp[3]
 
-    const contractInput = output['contracts'][contract]
+    const contractInput = output.contracts[contract]
 
-    const gasEstimates = contractInput['gasEstimates']
-    const translatedGasEstimates: Record<string, any> = {}
+    const gasEstimates = contractInput.gasEstimates
+    const translatedGasEstimates: GasEstimates = {}
 
-    if (gasEstimates['creation']) {
-      translatedGasEstimates['creation'] = {
-        codeDepositCost: translateGasEstimates(gasEstimates['creation'][1]),
-        executionCost: translateGasEstimates(gasEstimates['creation'][0])
+    if (gasEstimates.creation) {
+      translatedGasEstimates.creation = {
+        codeDepositCost: translateGasEstimates(gasEstimates.creation[1]),
+        executionCost: translateGasEstimates(gasEstimates.creation[0])
       }
     }
-    if (gasEstimates['internal']) {
-      translatedGasEstimates['internal'] = translateGasEstimates(gasEstimates['internal'])
-    }
-    if (gasEstimates['external']) {
-      translatedGasEstimates['external'] = translateGasEstimates(gasEstimates['external'])
-    }
+    if (gasEstimates.internal) translatedGasEstimates.internal = translateGasEstimates(gasEstimates.internal)
+    if (gasEstimates.external) translatedGasEstimates.external = translateGasEstimates(gasEstimates.external)
 
     const contractOutput = {
-      abi: JSON.parse(contractInput['interface']),
-      metadata: contractInput['metadata'],
+      abi: JSON.parse(contractInput.interface),
+      metadata: contractInput.metadata,
       evm: {
-        legacyAssembly: contractInput['assembly'],
+        legacyAssembly: contractInput.assembly,
         bytecode: {
-          object: contractInput['bytecode'] && linker.linkBytecode(contractInput['bytecode'], libraries || {}),
-          opcodes: contractInput['opcodes'],
-          sourceMap: contractInput['srcmap'],
-          linkReferences: contractInput['bytecode'] && linker.findLinkReferences(contractInput['bytecode'])
+          object: contractInput.bytecode && linker.linkBytecode(contractInput.bytecode, libraries || {}),
+          opcodes: contractInput.opcodes,
+          sourceMap: contractInput.srcmap,
+          linkReferences: contractInput.bytecode && linker.findLinkReferences(contractInput.bytecode)
         },
         deployedBytecode: {
-          object:
-            contractInput['runtimeBytecode'] && linker.linkBytecode(contractInput['runtimeBytecode'], libraries || {}),
-          sourceMap: contractInput['srcmapRuntime'],
-          linkReferences:
-            contractInput['runtimeBytecode'] && linker.findLinkReferences(contractInput['runtimeBytecode'])
+          object: contractInput.functionHashes && linker.linkBytecode(contractInput.functionHashes, libraries || {}),
+          sourceMap: contractInput.srcmapRuntime,
+          linkReferences: contractInput.functionHashes && linker.findLinkReferences(contractInput.functionHashes)
         },
-        methodIdentifiers: contractInput['functionHashes'],
+        methodIdentifiers: contractInput.functionHashes,
         gasEstimates: translatedGasEstimates
       }
     }
 
-    if (!ret['contracts'][fileName]) {
-      ret['contracts'][fileName] = {}
-    }
+    if (!ret.contracts[fileName]) ret.contracts[fileName] = {}
 
-    ret['contracts'][fileName][contractName] = contractOutput
+    ret.contracts[fileName][contractName] = contractOutput
   }
 
   const sourceMap: Record<string, string> = {}
-  for (const sourceId in output['sourceList']) {
-    sourceMap[output['sourceList'][sourceId]] = sourceId
-  }
+  for (const sourceId in output.sourceList) sourceMap[output.sourceList[sourceId]] = sourceId
 
   for (const source in output['sources']) {
     ret['sources'][source] = {
@@ -177,22 +151,17 @@ const escapeString = (text: string) => text.replace(/\n/g, '\\n').replace(/\r/g,
 
 // 'asm' can be an object or a string
 function formatAssemblyText(asm: Assembly, prefix: string, source: string | undefined) {
-  if (typeof asm === 'string' || asm === null || asm === undefined) {
-    return `${prefix + (asm || '')}\n`
-  }
+  if (typeof asm === 'string' || asm == null) return `${prefix + (asm || '')}\n`
   let text = `${prefix}.code\n`
-  asm['.code'].forEach(({ value, begin, end, name }, i) => {
+  asm['.code'].forEach(({ value, begin, end, name }) => {
     const v = value === undefined ? '' : value
     let src = ''
-    if (source !== undefined && begin !== undefined && end !== undefined) {
-      src = escapeString(source.slice(begin, end))
-    }
-    if (src.length > 30) {
-      src = `${src.slice(0, 30)}...`
-    }
-    if (name !== 'tag') {
-      text += '  '
-    }
+    if (source !== undefined && begin !== undefined && end !== undefined) src = escapeString(source.slice(begin, end))
+
+    if (src.length > 30) src = `${src.slice(0, 30)}...`
+
+    if (name !== 'tag') text += '  '
+
     text += `${prefix + name} ${v}\t\t\t${src}\n`
   })
   text += `${prefix}.data\n`
@@ -205,6 +174,5 @@ function formatAssemblyText(asm: Assembly, prefix: string, source: string | unde
   return text
 }
 
-export function prettyPrintLegacyAssemblyJSON(assembly: Assembly, source: string) {
-  return formatAssemblyText(assembly, '', source)
-}
+export const prettyPrintLegacyAssemblyJSON = (assembly: Assembly, source: string) =>
+  formatAssemblyText(assembly, '', source)

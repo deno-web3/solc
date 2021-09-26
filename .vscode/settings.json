@@ -1,5 +1,6 @@
 {
   "deno.enable": true,
+  "deno.lint": true,
   "deno.suggest.imports.hosts": {
     "https://deno.land/x/": true,
     "https://x.nest.land/": true,

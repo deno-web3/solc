@@ -1,15 +1,9 @@
 import { keccak256 } from './deps.ts'
 import { assert } from './utils.ts'
 
-function libraryHashPlaceholder(input: string) {
-  return '$' + keccak256(input).slice(0, 34) + '$'
-}
+const libraryHashPlaceholder = (input: string) => `$${keccak256(input).slice(0, 34)}$`
 
 export const linkBytecode = (bytecode: string, libraries: Record<string, any>) => {
-  // @ts-ignore
-  assert(typeof bytecode === 'string')
-  // @ts-ignore
-  assert(typeof libraries === 'object')
   // NOTE: for backwards compatibility support old compiler which didn't use file names
   const librariesComplete: Record<string, any> = {}
   for (var libraryName in libraries) {
@@ -22,9 +16,7 @@ export const linkBytecode = (bytecode: string, libraries: Record<string, any>) =
     } else {
       // backwards compatible API for early solc-js versions
       const parsed = libraryName.match(/^([^:]+):(.+)$/)
-      if (parsed) {
-        librariesComplete[parsed[2]] = libraries[libraryName]
-      }
+      if (parsed) librariesComplete[parsed[2]] = libraries[libraryName]
       librariesComplete[libraryName] = libraries[libraryName]
     }
   }
@@ -44,9 +36,7 @@ export const linkBytecode = (bytecode: string, libraries: Record<string, any>) =
       // truncate to 37 characters
       const truncatedName = name.slice(0, 36)
       const libLabel = `__${truncatedName}${Array(37 - truncatedName.length).join('_')}__`
-      while (bytecode.includes(libLabel)) {
-        bytecode = bytecode.replace(libLabel, hexAddress)
-      }
+      while (bytecode.includes(libLabel)) bytecode = bytecode.replace(libLabel, hexAddress)
     }
 
     replace(libraryName)
@@ -56,13 +46,11 @@ export const linkBytecode = (bytecode: string, libraries: Record<string, any>) =
   return bytecode
 }
 
-export const findLinkReferences = (bytecode: string): Record<string, any[]> => {
-  // @ts-ignore
-  assert(typeof bytecode === 'string')
+export const findLinkReferences = (bytecode: string): Record<string, { start: number; length: number }[]> => {
   // find 40 bytes in the pattern of __...<36 digits>...__
   // e.g. __Lib.sol:L_____________________________
-  const linkReferences: Record<string, any[]> = {}
-  let offset: number = 0
+  const linkReferences: Record<string, { start: number; length: number }[]> = {}
+  let offset = 0
   while (true) {
     const found = bytecode.match(/__(.{36})__/)
     if (!found) break
@@ -72,9 +60,7 @@ export const findLinkReferences = (bytecode: string): Record<string, any[]> => {
     // NOTE: this has no way of knowing if the trailing underscore was part of the name
     const libraryName: string = found[1].replace(/_+$/gm, '')
 
-    if (!linkReferences[libraryName]) {
-      linkReferences[libraryName] = []
-    }
+    if (!linkReferences[libraryName]) linkReferences[libraryName] = []
 
     linkReferences[libraryName].push({
       // offsets are in bytes in binary representation (and not hex)

@@ -1,17 +1,5 @@
-<div align="center">
-
-# solc
-
-</div>
-
-> ⚠️ Highly experimental!
-
-Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
-
-## Example
-
-```ts
-import { solc } from 'https://deno.land/x/solc/mod.ts'
+import { solc } from './mod.ts'
+import type { Contract } from './types.ts'
 
 const input = {
   language: 'Solidity',
@@ -29,16 +17,11 @@ const input = {
   }
 }
 
-const { contracts } = JSON.parse(solc.compile(JSON.stringify(input)))
+const { contracts } = JSON.parse(solc.compile(JSON.stringify(input))) as {
+  contracts: Record<string, Record<string, Contract>>
+}
 
 // `output` here contains the JSON output as specified in the documentation
 for (const contractName in contracts['test.sol']) {
   console.log(`${contractName}: ${contracts['test.sol'][contractName].evm.bytecode.object}`)
 }
-```
-
-And then run with
-
-```sh
-deno run -A --unstable --no-check mod.js
-```
