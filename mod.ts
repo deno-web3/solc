@@ -21,6 +21,10 @@ globalThis.process = process
 
 const soljsonPath = `file://${Deno.cwd()}/.cache/soljson.js'`
 
-if (!(await exists(soljsonPath))) await download()
+if (!(await exists(soljsonPath))) {
+  console.log(`Downloading soljson to ${soljsonPath}`)
+
+  await download()
+}
 
 export const solc = setupMethods(require(soljsonPath))
