@@ -19,7 +19,7 @@ process.versions = { node: '12.4.0' }
 // @ts-ignore Node.js
 globalThis.process = process
 
-const soljsonPath = `file://${Deno.cwd()}/.cache/soljson.js'`
+const soljsonPath = `${Deno.cwd()}/.cache/soljson.js`
 
 if (!(await exists(soljsonPath))) {
   console.log(`Downloading soljson to ${soljsonPath}`)

@@ -16,7 +16,8 @@ export const download = async (version?: string) => {
 
   if (rdr) {
     const r = readerFromStreamReader(rdr)
-    const f = await Deno.open('./soljson.js', { create: true, write: true })
+    await Deno.mkdir(`${Deno.cwd()}/.cache`)
+    const f = await Deno.open(`${Deno.cwd()}/.cache/soljson.js`, { create: true, write: true })
     await copy(r, f)
     f.close()
   }
