@@ -3,7 +3,6 @@ export type Assembly = string | null | undefined | { '.code': any[]; '.data': an
 export type FunctionResult = { contents: string; error: string }
 
 export type Input = {
-  language: 'Solidity'
   sources: Record<string, { content: string }>
   settings?: {
     optimizer?: {

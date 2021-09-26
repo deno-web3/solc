@@ -4,7 +4,7 @@
 
 # solc
 
-[![nest badge][nest-badge]](https://nest.land/package/solc) [![][code-quality-img]][code-quality]
+[![nest badge][nest-badge]](https://nest.land/package/solc)
 
 </div>
 
@@ -12,13 +12,16 @@
 
 Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
+## Docs
+
+See [solc-js README](https://github.com/ethereum/solc-js#readme).
+
 ## Example
 
 ```ts
 import { solc } from 'https://deno.land/x/solc/mod.ts'
 
 const input = {
-  language: 'Solidity',
   sources: {
     'test.sol': {
       content: 'contract C { function f() public { } }'
@@ -46,6 +49,10 @@ And then run with
 ```sh
 deno run -A --unstable --no-check mod.js
 ```
+
+## TODO
+
+- `solc/download.ts` to download a specific solidity version
 
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-libs/solc?style=for-the-badge&color=black&
 [code-quality]: https://www.codefactor.io/repository/github/deno-libs/solc

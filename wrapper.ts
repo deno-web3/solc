@@ -11,8 +11,8 @@ export const setupMethods = (soljson: {
   setValue: (arg0: any, arg1: any, arg2: string) => void
   UTF8ToString: (data: any) => any
   Pointer_stringify: any
-  addFunction: any
-  Runtime: { addFunction: any; removeFunction: any }
+  addFunction: (arg1: any, arg2: string) => any
+  Runtime: { addFunction: (arg1: any, arg2: string) => any; removeFunction: (x: any) => any }
   removeFunction: (x: any) => any
 }) => {
   const version: () => string =
@@ -173,7 +173,7 @@ export const setupMethods = (soljson: {
   }
 
   // Expects a Standard JSON I/O but supports old compilers
-  const compileStandardWrapper = (_input: string, readCallback?: any) => {
+  const compileStandardWrapper = (_input: string, readCallback?: any): string => {
     if (compileStandard !== null) return compileStandard(_input, readCallback)
 
     function formatFatalError(message: string) {
@@ -198,8 +198,6 @@ export const setupMethods = (soljson: {
       return formatFatalError(`Invalid JSON supplied: ${e.message}`)
     }
 
-    if (input.language !== 'Solidity') return formatFatalError('Only "Solidity" is supported as a language.')
-
     // NOTE: this is deliberately `== null`
     if (input.sources == null || Object.keys(input.sources).length === 0)
       return formatFatalError('No input sources specified.')
@@ -207,7 +205,7 @@ export const setupMethods = (soljson: {
     const isOptimizerEnabled = (input: Input) => input.settings?.optimizer?.enabled
 
     function translateSources(input: Input) {
-      const sources: Record<string, any> = {}
+      const sources: Record<string, string> = {}
       for (const source in input.sources) {
         if (input.sources[source].content !== null) {
           sources[source] = input.sources[source].content
