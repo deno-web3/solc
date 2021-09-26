@@ -19,14 +19,20 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme).
 ## Example
 
 ```ts
-import { setupSolc } from 'https://deno.land/x/solc/mod.ts'
 import { download } from 'https://deno.land/x/solc/download.ts'
+import { setupMethods } from 'https://deno.land/x/solc/wrapper.ts'
+import 'https://deno.land/x/solc/process.ts'
+import { createRequire } from 'https://deno.land/std@0.108.0/node/module.ts'
+import { exists } from 'https://deno.land/x/solc/utils.ts'
 
-await download('./soljson.js') // download soljson
+if (!(await exists('./soljson.js'))) download('./soljson.js')
 
-const solc = setupSolc('./soljson.js') // require(...) soljson to Deno
+const require = createRequire(import.meta.url)
+
+const solc = setupMethods(require('./soljson.js'))
 
 const input = {
+  language: 'Solidity',
   sources: {
     'test.sol': {
       content: 'contract C { function f() public { } }'
@@ -41,7 +47,9 @@ const input = {
   }
 }
 
-const { contracts } = JSON.parse(solc.compile(JSON.stringify(input)))
+const result = JSON.parse(solc.compile(JSON.stringify(input)))
+
+const { contracts } = result
 
 // `output` here contains the JSON output as specified in the documentation
 for (const contractName in contracts['test.sol']) {
@@ -54,6 +62,8 @@ And then run with
 ```sh
 deno run -A --unstable --no-check mod.js
 ```
+
+See [example](https://github.com/deno-web3/solc/tree/master/example) for a more advanced example.
 
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-libs/solc?style=for-the-badge&color=black&
 [code-quality]: https://www.codefactor.io/repository/github/deno-libs/solc
