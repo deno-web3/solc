@@ -19,6 +19,8 @@ process.versions = { node: '12.4.0' }
 // @ts-ignore Node.js
 globalThis.process = process
 
-if (!(await exists('./soljson.js'))) await download()
+const soljsonPath = `file://${Deno.cwd()}/.cache/soljson.js'`
 
-export const solc = setupMethods(require('./soljson.js'))
+if (!(await exists(soljsonPath))) await download()
+
+export const solc = setupMethods(require(soljsonPath))
