@@ -20,5 +20,5 @@ globalThis.process = process
 export const setupSolc = (soljsonPath: string) => {
   console.log(`Calling require(${soljsonPath})`)
 
-  setupMethods(require(soljsonPath))
+  return setupMethods(require(soljsonPath))
 }
