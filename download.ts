@@ -16,7 +16,6 @@ export const download = async (path: string, version?: string) => {
 
   if (rdr) {
     const r = readerFromStreamReader(rdr)
-    await Deno.mkdir(path)
     const f = await Deno.open(path, { create: true, write: true })
     await copy(r, f)
     f.close()
