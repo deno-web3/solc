@@ -57,13 +57,9 @@ function translateErrors(
 }
 
 function translateGasEstimates(gasEstimates: null | number | Record<string, any>) {
-  if (gasEstimates === null) {
-    return 'infinite'
-  }
+  if (gasEstimates === null) return 'infinite'
 
-  if (typeof gasEstimates === 'number') {
-    return gasEstimates.toString()
-  }
+  if (typeof gasEstimates === 'number') return gasEstimates.toString()
 
   const gasEstimatesTranslated: Record<string, any> = {}
   for (const func in gasEstimates) {
