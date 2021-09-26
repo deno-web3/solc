@@ -12,6 +12,8 @@
 
 Solidity v0.8.7 bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
+Running solc for the first time will download soljson file to `.cache/soljson.js`.
+
 ## Docs
 
 See [solc-js README](https://github.com/ethereum/solc-js#readme).
