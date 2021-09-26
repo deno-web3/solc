@@ -17,4 +17,8 @@ process.versions = { node: '12.4.0' }
 // @ts-ignore Node.js
 globalThis.process = process
 
-export const setupSolc = (soljsonPath: string) => setupMethods(require(soljsonPath))
+export const setupSolc = (soljsonPath: string) => {
+  console.log(`Calling require(${soljsonPath})`)
+
+  setupMethods(require(soljsonPath))
+}
