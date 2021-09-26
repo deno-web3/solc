@@ -1,5 +1,5 @@
-import * as linker from './linker.ts'
-import type { Assembly, GasEstimates, Output } from './types.ts'
+// import * as linker from './linker.ts'
+import type { Assembly /* , GasEstimates, Output  */ } from './types.ts'
 
 /// Translate old style version numbers to semver.
 /// Old style: 0.3.6-3fc68da5/Release-Emscripten/clang
@@ -26,7 +26,7 @@ export function versionToSemver(version: string) {
   return version
 }
 
-function translateErrors(
+/* function translateErrors(
   ret: {
     type: string
     component: string
@@ -66,10 +66,10 @@ function translateGasEstimates(gasEstimates: null | number | Record<string, any>
     gasEstimatesTranslated[func] = translateGasEstimates(gasEstimates[func])
   }
   return gasEstimatesTranslated
-}
+} */
 
-export function translateJsonCompilerOutput(output: Output, libraries: Record<string, any>) {
-  const ret: { errors: any[]; contracts: Record<string, any>; sources: Record<string, any> } = {
+/* export function translateJsonCompilerOutput(output: Output, libraries: Record<string, any>) {
+  const ret: { errors: any; contracts: Record<string, any>; sources: Record<string, any> } = {
     errors: [],
     contracts: {},
     sources: {}
@@ -77,6 +77,7 @@ export function translateJsonCompilerOutput(output: Output, libraries: Record<st
 
   const errors = output.error ? [output.error] : output.errors
 
+  // @ts-ignore 🤷
   translateErrors(ret.errors, errors)
 
   for (const contract in output.contracts) {
@@ -93,6 +94,9 @@ export function translateJsonCompilerOutput(output: Output, libraries: Record<st
     const contractInput = output.contracts[contract]
 
     const gasEstimates = contractInput.gasEstimates
+
+    console.log(gasEstimates)
+
     const translatedGasEstimates: GasEstimates = {}
 
     if (gasEstimates.creation) {
@@ -141,7 +145,7 @@ export function translateJsonCompilerOutput(output: Output, libraries: Record<st
   }
 
   return ret
-}
+} */
 
 const escapeString = (text: string) => text.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')
 

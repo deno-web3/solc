@@ -1,7 +1,7 @@
 import { semver } from './deps.ts'
 import { assert } from './utils.ts'
 import * as translate from './translate.ts'
-import { FunctionResult, Input, Output } from './types.ts'
+import { FunctionResult, Input } from './types.ts'
 
 export const setupMethods = (soljson: {
   cwrap: (arg0?: any, arg1?: any, arg2?: any[]) => (arg0?: any, arg1?: any) => any
@@ -202,8 +202,6 @@ export const setupMethods = (soljson: {
     if (input.sources == null || Object.keys(input.sources).length === 0)
       return formatFatalError('No input sources specified.')
 
-    const isOptimizerEnabled = (input: Input) => input.settings?.optimizer?.enabled
-
     function translateSources(input: Input) {
       const sources: Record<string, string> = {}
       for (const source in input.sources) {
@@ -217,42 +215,8 @@ export const setupMethods = (soljson: {
       return sources
     }
 
-    function translateOutput(_output: string, libraries: Record<string, any>) {
-      let output: Output
-      try {
-        output = JSON.parse(_output)
-      } catch (e) {
-        return formatFatalError(`Compiler returned invalid JSON: ${e.message}`)
-      }
-      output = translate.translateJsonCompilerOutput(output, libraries)!
-      if (output == null) return formatFatalError('Failed to process output.')
-      return JSON.stringify(output)
-    }
-
     const sources = translateSources(input)
     if (sources === null || Object.keys(sources).length === 0) return formatFatalError('Failed to process sources.')
-
-    // Try linking if libraries were supplied
-    const libraries = input.settings?.libraries
-
-    // Try to wrap around old versions
-    if (compileJSONCallback !== null) {
-      return translateOutput(
-        compileJSONCallback(JSON.stringify({ sources }), isOptimizerEnabled(input), readCallback),
-        libraries!
-      )
-    }
-
-    if (compileJSONMulti !== null)
-      return translateOutput(compileJSONMulti(JSON.stringify({ sources }), isOptimizerEnabled(input)), libraries!)
-
-    // Try our luck with an ancient compiler
-    if (compileJSON !== null) {
-      if (Object.keys(sources).length !== 1) {
-        return formatFatalError('Multiple sources provided, but compiler only supports single input.')
-      }
-      return translateOutput(compileJSON(sources[Object.keys(sources)[0]], isOptimizerEnabled(input)), libraries!)
-    }
 
     return formatFatalError('Compiler does not support any known interface.')
   }
@@ -264,7 +228,7 @@ export const setupMethods = (soljson: {
       compileSingle: compileJSON,
       compileMulti: compileJSONMulti,
       compileCallback: compileJSONCallback,
-      compileStandard: compileStandard
+      compileStandard
     },
     features: {
       legacySingleInput: compileJSON !== null,

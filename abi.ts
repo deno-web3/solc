@@ -1,6 +1,7 @@
 import { semver } from './deps.ts'
+import { ABI } from './types.ts'
 
-export function update(compilerVersion: string, abi: any[]) {
+export function update(compilerVersion: string, abi: ABI[]) {
   let hasConstructor = false
   let hasFallback = false
 
