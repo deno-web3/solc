@@ -19,7 +19,7 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme).
 ## Example
 
 ```ts
-import { solc } from 'https://deno.land/x/solc/mod.ts'
+import { solc } from 'https://x.nest.land/solc@0.0.4/mod.ts'
 
 const input = {
   sources: {
