@@ -4,7 +4,7 @@
 
 # solc
 
-[![nest badge][nest-badge]](https://nest.land/package/solc)
+[![nest badge][nest-badge]](https://nest.land/package/solc) [![][code-quality-img]][code-quality]
 
 </div>
 
@@ -65,6 +65,6 @@ deno run -A --unstable --no-check mod.js
 
 See [example](https://github.com/deno-web3/solc/tree/master/example) for a more advanced example.
 
-[code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-libs/solc?style=for-the-badge&color=626890&
-[code-quality]: https://www.codefactor.io/repository/github/deno-libs/solc
+[code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-web3/solc?style=for-the-badge&color=626890&
+[code-quality]: https://www.codefactor.io/repository/github/deno-web3/solc
 [nest-badge]: https://img.shields.io/badge/publushed%20on-nest.land-626890?style=for-the-badge
