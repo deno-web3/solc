@@ -12,6 +12,8 @@
 
 Solidity bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
+Solidity 0.7+ is supported.
+
 ## Docs
 
 See [solc-js README](https://github.com/ethereum/solc-js#readme).

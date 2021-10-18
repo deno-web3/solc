@@ -128,3 +128,5 @@ export type Output = {
   sourceList?: Record<string, any>
   sources: Record<string, { id: number; AST?: any }>
 }
+
+export type LinkReferences = Record<string, { start: number; length: number }[]>
