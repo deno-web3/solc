@@ -32,7 +32,7 @@ export type Contract = {
   gasEstimates: GasEstimates
   interface: string
   metadata: string
-  assembly: any
+  assembly: string
   bytecode: any
   opcodes: string
   srcmap: any
@@ -111,14 +111,32 @@ export type ContractEVM = {
   methodIdentifiers: Record<string, string>
 }
 
+export type DocMethods = Record<
+  string,
+  {
+    details: string
+    params: Record<string, string>
+  }
+>
+
 export type CompiledContract = {
   abi: ABI[]
-  devdoc: { kind: string; methods: Record<string, any>; version: 1 }
+  devdoc: { kind: string; methods: DocMethods; version: 1 }
   evm: ContractEVM
   ewasm: { wasm: string }
   metadata: string
-  storageLayout: { storage: any[]; types: any }
-  userdoc: { kind: string; methods: any; version: number }
+  storageLayout: {
+    storage: {
+      astId: number
+      contract: string
+      label: string
+      offset: number
+      slot: string
+      type: string
+    }[]
+    types: Record<string, { encoding: string; key?: string; label: string; numberOfBytes: string; value?: string }>
+  }
+  userdoc: { kind: string; methods: DocMethods; version: number }
 }
 
 export type Output = {

@@ -54,6 +54,4 @@ const compile = () => JSON.parse(solc.compile(JSON.stringify(input)))
 
 const result = compile() as Output
 
-console.log(solc.features)
-
-console.log(result.contracts['MyToken.sol'].MyToken.abi)
+console.log(result.contracts['MyToken.sol'].MyToken.evm.bytecode)
