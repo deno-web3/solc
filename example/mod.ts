@@ -1,5 +1,5 @@
 import { setupMethods } from '../wrapper.ts'
-import { createRequire } from 'https://deno.land/std@0.111.0/node/module.ts'
+import { createRequire } from 'https://deno.land/std@0.114.0/node/module.ts'
 import '../env.ts'
 import { Input, Output } from '../types.ts'
 import { exists } from '../utils.ts'
