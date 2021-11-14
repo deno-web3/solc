@@ -4,7 +4,7 @@
   "entry": "./mod.ts",
   "description": "💎 Solidity v0.8.7 bindings for Deno",
   "homepage": "https://github.com/deno-libs/solc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "releaseType": null,
   "unstable": false,
   "unlisted": false,
