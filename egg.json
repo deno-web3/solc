@@ -8,7 +8,11 @@
   "releaseType": null,
   "unstable": false,
   "unlisted": false,
-  "files": ["README.md", "*.ts", "LICENSE"],
+  "files": [
+    "README.md",
+    "*.ts",
+    "LICENSE"
+  ],
   "ignore": [],
   "checkFormat": false,
   "checkTests": false,
