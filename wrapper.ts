@@ -3,7 +3,7 @@ import { FunctionResult, Input } from './types.ts'
 
 export const setupMethods = (soljson: {
   cwrap: (arg0?: unknown, arg1?: unknown, arg2?: unknown[]) => (arg0?: unknown, arg1?: unknown) => any
-  _malloc: (arg0?: unknown, arg1?: unknown) => any
+  _malloc: (arg0?: unknown, arg1?: unknown) => unknown
   lengthBytesUTF8: (arg0: string) => number
   stringToUTF8: (arg0: string, arg1: unknown, arg2: number) => void
   setValue: (arg0: unknown, arg1: unknown, arg2: string) => void
@@ -57,7 +57,7 @@ export const setupMethods = (soljson: {
 
   const wrapCallbackWithKind = (callback: { (kind: 'source' | 'smt-query', data: unknown): FunctionResult }) => {
     assert(typeof callback === 'function', 'Invalid callback specified.')
-    return (context: number, kind: unknown, data: unknown, contents: string, error: string) => {
+    return (context: number, kind: unknown, data: string, contents: string, error: string) => {
       // Must be a null pointer.
       assert(context === 0, 'Callback context must be null.')
       const result = callback(copyFromCString(kind), copyFromCString(data))
@@ -68,7 +68,7 @@ export const setupMethods = (soljson: {
 
   // This calls compile() with args || cb
   const runWithCallbacks = (
-    callbacks: Record<string, (...args: unknown[]) => any>,
+    callbacks: Record<string, (arg: unknown) => any>,
     compile: (...args: unknown[]) => any,
     args: unknown[]
   ) => {
@@ -110,21 +110,20 @@ export const setupMethods = (soljson: {
     return output
   }
 
-  let compileJSON: ((arg0: unknown, arg1: unknown) => unknown) | null = null
+  let compileJSON: ((arg0: string, arg1: unknown) => string) | null = null
   if ('_compileJSON' in soljson) {
     // input (text), optimize (bool) -> output (jsontext)
     compileJSON = soljson.cwrap('compileJSON', 'string', ['string', 'number'])
   }
 
-  let compileJSONMulti: ((arg0: string, arg1: unknown) => unknown) | null = null
+  let compileJSONMulti: ((arg0: string, arg1: unknown) => string) | null = null
   if ('_compileJSONMulti' in soljson) {
     // input (jsontext), optimize (bool) -> output (jsontext)
     compileJSONMulti = soljson.cwrap('compileJSONMulti', 'string', ['string', 'number'])
   }
 
   let compileJSONCallback: {
-    (arg0: string, arg1: unknown, arg2: any): any
-    (input: unknown, optimize: boolean, readCallback: unknown): unknown
+    (input: unknown, optimize: boolean, readCallback: Record<string, (...args: unknown[]) => any>): unknown
   } | null = null
   if ('_compileJSONCallback' in soljson) {
     // input (jsontext), optimize (bool), callback (ptr) -> output (jsontext)
@@ -134,9 +133,7 @@ export const setupMethods = (soljson: {
   }
 
   let compileStandard: {
-    (arg0: any, arg1: any): any
-    (input: any, readCallback: unknown): any
-    (input: unknown, callbacks: unknown): unknown
+    (arg0: string, arg1: any): string
   } | null = null
   if ('_compileStandard' in soljson) {
     // input (jsontext), callback (ptr) -> output (jsontext)

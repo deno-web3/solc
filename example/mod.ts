@@ -47,8 +47,6 @@ const input: Input = {
   }
 }
 
-const compile = () => JSON.parse(solc.compile(JSON.stringify(input)))
-
-const result = compile() as Output
+const result: Output = JSON.parse(solc.compile(JSON.stringify(input)))
 
 console.log(result.contracts['MyToken.sol'].MyToken.evm.bytecode)

@@ -14,9 +14,11 @@ export type Input = {
   language: 'Solidity' | 'Yul'
   sources: Record<string, { content: string }>
   settings: Partial<{
-    optimizer: {
-      enabled?: boolean
-    }
+    optimizer: Partial<{
+      enabled: boolean
+      runs: number
+    }>
+
     outputSelection: Record<string, Record<string, string[]>>
     libraries: Record<string, any>
   }>
@@ -33,12 +35,12 @@ export type Contract = {
   interface: string
   metadata: string
   assembly: string
-  bytecode: any
+  bytecode: string
   opcodes: string
   srcmap: any
-  runtimeBytecode: any
-  srcmapRuntime: any
-  functionHashes: any
+  runtimeBytecode: string
+  srcmapRuntime: string
+  functionHashes: Record<string, string>
 }
 
 export type CompilationError = {
@@ -52,26 +54,33 @@ export type CompilationError = {
 }
 
 export type ABI = {
-  inputs?: any[]
+  inputs: {
+    internalType: string
+    name: string
+    type: string
+  }[]
+
   name?: string
-  outputs?: any[]
+  outputs?: { internalType: string; name: string; type: string }[]
   stateMutability: string
   type: string
   payable?: boolean
   constant?: boolean
 }
 
+type Statement = {
+  body: { nodeType: string; src: string; statements: Statement[] }
+  name: string
+  nodeType: string
+  parameters: { name: string; nodeType: string; src: string; type: string }[]
+  src: string
+}
+
 export type YulAST = {
   nodeType: string
   src: string
   name?: string
-  statements: {
-    body: { nodeType: string; src: string; statements: any[] }
-    name: string
-    nodeType: string
-    parameters: { name: string; nodeType: string; src: string; type: string }[]
-    src: string
-  }[]
+  statements: Statement[]
 }
 
 export type GeneratedSources = {
@@ -92,7 +101,7 @@ export type ContractEVM = {
   bytecode: {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
-    linkReferences: any
+    linkReferences: Record<string, unknown>
     object: string
     opcodes: string
     sourceMap: string
@@ -101,12 +110,18 @@ export type ContractEVM = {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
     immutableReferences: Record<string, { length: number; start: number }[]>
-    linkReferences: any
+    linkReferences: Record<string, unknown>
   }
   gasEstimates: GasEstimates
   legacyAssembly: {
     '.code': LegacyAssemblyCode[]
-    '.data': Record<string, any>
+    '.data': Record<
+      string,
+      {
+        '.auxdata': string
+        '.code': LegacyAssemblyCode[]
+      }
+    >
   }
   methodIdentifiers: Record<string, string>
 }
