@@ -1,4 +1,4 @@
-import * as _assert from 'https://deno.land/x/std@0.122.0/node/assert.ts'
+import * as _assert from 'https://deno.land/x/std@0.148.0/node/assert.ts'
 
 export const assert = (actual: unknown, message: string) => _assert.strict(actual, message)
 

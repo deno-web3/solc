@@ -44,7 +44,7 @@ export type Contract = {
 }
 
 export type CompilationError = {
-  component: string
+  component: 'general' | string
   errorCode: string
   formattedMessage: string
   message: string
@@ -101,7 +101,7 @@ export type ContractEVM = {
   bytecode: {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
-    linkReferences: Record<string, unknown>
+    linkReferences: Record<string, string>[]
     object: string
     opcodes: string
     sourceMap: string
@@ -110,7 +110,7 @@ export type ContractEVM = {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
     immutableReferences: Record<string, { length: number; start: number }[]>
-    linkReferences: Record<string, unknown>
+    linkReferences: Record<string, string>[]
   }
   gasEstimates: GasEstimates
   legacyAssembly: {
@@ -158,7 +158,7 @@ export type Output = {
   error?: CompilationError
   errors: CompilationError[]
   contracts: Record<string, Record<string, CompiledContract>>
-  sourceList?: Record<string, any>
+  sourceList?: string[]
   sources: Record<string, { id: number; AST?: any }>
 }
 
