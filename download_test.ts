@@ -1,6 +1,6 @@
 import { it, describe, run, expect, afterAll } from 'https://deno.land/x/tincan@1.0.1/mod.ts'
 import { download } from 'solc/download'
-import { exists } from './test_helpers.ts'
+import { exists } from './helpers_test.ts'
 
 describe('solc/download.ts', () => {
   afterAll(async () => {
