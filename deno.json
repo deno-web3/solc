@@ -23,5 +23,14 @@
     "solc/download": "./download.ts",
     "solc/types": "./types.ts",
     "solc/env": "./env.ts"
+  },
+  "test": {
+    "files": {
+      "exclude": ["./**/*.js"]
+    }
+  },
+  "tasks": {
+    "test": "deno test --allow-net --allow-read --allow-write --coverage=coverage",
+    "cov": "deno coverage ./coverage --lcov > coverage.lcov"
   }
 }
