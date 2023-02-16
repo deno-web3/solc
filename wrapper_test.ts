@@ -1,4 +1,4 @@
-import { it, describe, run, expect, beforeAll, afterAll } from 'https://deno.land/x/tincan@1.0.1/mod.ts'
+import { it, describe, run, expect, beforeAll } from 'https://deno.land/x/tincan@1.0.1/mod.ts'
 import { wrapper } from './wrapper.ts'
 import { createRequire } from './deps.ts'
 import { download } from 'solc/download'

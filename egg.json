@@ -4,8 +4,8 @@
   "entry": "./mod.ts",
   "description": "💎 Solidity v0.8.7 bindings for Deno",
   "homepage": "https://github.com/deno-libs/solc",
-  "version": "1.0.6",
-  "releaseType": null,
+  "version": "2.0.1",
+  "releaseType": "patch",
   "unstable": false,
   "unlisted": false,
   "files": [
@@ -17,5 +17,7 @@
   "checkFormat": false,
   "checkTests": false,
   "checkInstallation": true,
-  "check": true
+  "check": true,
+  "checkAll": true,
+  "repository": "https://github.com/deno-libs/solc"
 }
