@@ -1,4 +1,4 @@
-import { LibraryAddresses } from './deps.ts'
+import type { LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
 
 export type Input = {
   language: 'Solidity' | 'Yul'
@@ -147,3 +147,5 @@ export type Output = {
   sourceList?: string[]
   sources?: Record<string, { id: number; AST?: any }>
 }
+
+export type Wrapper = Omit<SolcWrapper, 'loadRemoteVersion' | 'setupMethods'>
