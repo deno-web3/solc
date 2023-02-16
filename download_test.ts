@@ -3,10 +3,6 @@ import { download } from 'solc/download'
 import { exists } from './helpers_test.ts'
 
 describe('solc/download.ts', () => {
-  afterAll(async () => {
-    await Deno.remove('./soljson.js')
-    await Deno.remove('./solc.js')
-  })
   it('downloads latest version to soljson.js file', async () => {
     await download()
     expect(await exists('./soljson.js')).toBe(true)
@@ -14,6 +10,7 @@ describe('solc/download.ts', () => {
   it('downloads latest version to any file path', async () => {
     await download('./solc.js')
     expect(await exists('./solc.js')).toBe(true)
+    await Deno.remove('./solc.js')
   })
   it('downloads a specific version', async () => {
     const jsFile = await download('./soljson.js', '0.8.17')

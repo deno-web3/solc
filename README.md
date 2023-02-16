@@ -77,7 +77,7 @@ console.log(result)
 And then run with
 
 ```sh
-deno run -A --unstable --no-check mod.ts
+deno run -allow-net --allow-read --allow-write mod.ts
 ```
 
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-web3/solc?style=for-the-badge&color=626890&

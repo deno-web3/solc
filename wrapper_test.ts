@@ -7,10 +7,10 @@ const require = createRequire(import.meta.url)
 
 describe('solc/wrapper.ts', () => {
   beforeAll(async () => {
-    await download('./soljson.js', '0.8.18')
+    await download('./soljson_test.js', '0.8.18')
   })
   it('returns JS interface', async () => {
-    const solc = wrapper(require('./soljson.js'))
+    const solc = wrapper(require('./soljson_test.js'))
 
     expect(solc.compile).toBeDefined()
     expect(solc.version()).toBe('0.8.18+commit.87f61d96.Emscripten.clang')
