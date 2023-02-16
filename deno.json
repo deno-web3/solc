@@ -31,6 +31,6 @@
   },
   "tasks": {
     "test": "deno test --allow-net --allow-read --allow-write --coverage=coverage",
-    "cov": "deno coverage ./coverage --lcov > coverage.lcov"
+    "cov": "deno coverage coverage --lcov > coverage.lcov"
   }
 }

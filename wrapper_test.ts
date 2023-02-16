@@ -9,9 +9,6 @@ describe('solc/wrapper.ts', () => {
   beforeAll(async () => {
     await download('./soljson.js', '0.8.18')
   })
-  afterAll(async () => {
-    await Deno.remove('./soljson.js')
-  })
   it('returns JS interface', async () => {
     const solc = wrapper(require('./soljson.js'))
 
