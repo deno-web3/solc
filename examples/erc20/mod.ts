@@ -1,7 +1,7 @@
 import { setupSolc } from 'solc'
 import { Input } from 'solc/types'
 import { download } from 'solc/download'
-import 'solc/env'
+
 import { exists } from '../../test_helpers.ts'
 
 if (!(await exists('./soljson.js'))) await download()

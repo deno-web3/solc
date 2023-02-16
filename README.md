@@ -22,7 +22,6 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme) and [Deno doc](
 import { setupSolc } from 'https://deno.land/x/solc/mod.ts'
 import { Input } from 'https://deno.land/x/solc/types.ts'
 import { download } from 'https://deno.land/x/solc/download.ts'
-import 'https://deno.land/x/solc/env.ts'
 
 const exists = async (filename: string): Promise<boolean> => {
   try {
