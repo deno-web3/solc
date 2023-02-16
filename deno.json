@@ -21,6 +21,7 @@
   "imports": {
     "solc": "./mod.ts",
     "solc/download": "./download.ts",
-    "solc/types": "./types.ts"
+    "solc/types": "./types.ts",
+    "solc/env": "./env.ts"
   }
 }
