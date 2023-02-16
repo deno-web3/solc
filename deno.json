@@ -1,0 +1,26 @@
+{
+  "lint": {
+    "files": {
+      "include": ["./**/*.ts"],
+      "exclude": ["./**/*.js"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": ["./**/*.ts", "./**/*.md", "./**/*.json"],
+      "exclude": ["./**/*.js"]
+    },
+    "options": {
+      "singleQuote": true,
+      "semiColons": false,
+      "useTabs": false,
+      "indentWidth": 2,
+      "lineWidth": 120
+    }
+  },
+  "imports": {
+    "solc": "./mod.ts",
+    "solc/download": "./download.ts",
+    "solc/types": "./types.ts"
+  }
+}

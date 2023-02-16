@@ -1,4 +1,4 @@
-import { readerFromStreamReader, copy } from './deps.ts'
+import { copy, readerFromStreamReader } from './deps.ts'
 
 export const download = async (path: string, version?: string) => {
   console.log(`Fetching releases...`)

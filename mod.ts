@@ -1,4 +1,4 @@
-import { setupMethods } from './wrapper.ts'
+import { wrapper } from './wrapper.ts'
 import { createRequire, process } from './deps.ts'
 
 const require = createRequire(import.meta.url)
@@ -14,8 +14,4 @@ globalThis.__filename = __filename
 // @ts-ignore Node.js
 globalThis.process = process
 
-export const setupSolc = (soljsonPath: string) => {
-  console.log(`Calling require(${soljsonPath})`)
-
-  return setupMethods(require(soljsonPath))
-}
+export const setupSolc = (soljsonPath: string) => wrapper(require(soljsonPath))

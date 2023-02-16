@@ -1,9 +1,0 @@
-{
-  "$schema": "https://deno.land/x/deno@v1.18.0/cli/schemas/config-file.v1.json",
-  "lint": {
-    "files": {
-      "include": ["./**/*.ts"],
-      "exclude": ["soljson.js"]
-    }
-  }
-}

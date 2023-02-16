@@ -1,211 +1,144 @@
-import { assert } from './utils.ts'
-import { FunctionResult, Input } from './types.ts'
+import {
+  CompileBindings,
+  CoreBindings,
+  createRequire,
+  LibraryAddresses,
+  setupBindings,
+  SolJson,
+  SupportedMethods,
+  translateJsonCompilerOutput,
+  Wrapper,
+} from './deps.ts'
+import type { Input } from './types.ts'
 
-export const setupMethods = (soljson: {
-  cwrap: (arg0?: unknown, arg1?: unknown, arg2?: unknown[]) => (arg0?: unknown, arg1?: unknown) => any
-  _malloc: (arg0?: unknown, arg1?: unknown) => unknown
-  lengthBytesUTF8: (arg0: string) => number
-  stringToUTF8: (arg0: string, arg1: unknown, arg2: number) => void
-  setValue: (arg0: unknown, arg1: unknown, arg2: string) => void
-  UTF8ToString: (data: unknown) => any
-  Pointer_stringify: (data: unknown) => unknown
-  addFunction: (arg1: unknown, arg2: string) => unknown
-  Runtime: { addFunction: (arg1: unknown, arg2: string) => unknown; removeFunction: (x: unknown) => any }
-  removeFunction: (x: unknown) => unknown
-}) => {
-  const version: () => string =
-    '_solidity_version' in soljson
-      ? soljson.cwrap('solidity_version', 'string', [])
-      : soljson.cwrap('version', 'string', [])
+function formatFatalError(message: string) {
+  return JSON.stringify({
+    errors: [
+      {
+        type: 'JSONError',
+        component: 'solcjs',
+        severity: 'error',
+        message: message,
+        formattedMessage: 'Error: ' + message,
+      },
+    ],
+  })
+}
 
-  let license
-  if ('_solidity_license' in soljson) {
-    license = soljson.cwrap('solidity_license', 'string', [])
-  } else if ('_license' in soljson) {
-    license = soljson.cwrap('license', 'string', [])
+function isNil(value: unknown) {
+  return value == null
+}
+
+function translateOutput(outputRaw: string, libraries?: LibraryAddresses) {
+  let parsedOutput
+
+  try {
+    parsedOutput = JSON.parse(outputRaw)
+  } catch (e) {
+    return formatFatalError(`Compiler returned invalid JSON: ${e.message}`)
   }
 
-  let alloc: (x: number) => unknown
-  if ('_solidity_alloc' in soljson) {
-    alloc = soljson.cwrap('solidity_alloc', 'number', ['number'])
-  } else {
-    alloc = soljson._malloc
-    assert(alloc, 'Expected malloc to be present.')
+  const output = translateJsonCompilerOutput(parsedOutput, libraries)
+
+  if (isNil(output)) {
+    return formatFatalError('Failed to process output.')
   }
 
-  let reset: () => void
-  if ('_solidity_reset' in soljson) reset = soljson.cwrap('solidity_reset', null, [])
+  return JSON.stringify(output)
+}
 
-  const copyToCString = (str: string, ptr: string) => {
-    const length = soljson.lengthBytesUTF8(str)
-    // This is allocating memory using solc's allocator.
-    //
-    // Before 0.6.0:
-    //   Assuming copyToCString is only used in the context of wrapCallback, solc will free these pointers.
-    //   See https://github.com/ethereum/solidity/blob/v0.5.13/libsolc/libsolc.h#L37-L40
-    //
-    // After 0.6.0:
-    //   The duty is on solc-js to free these pointers. We accomplish that by calling `reset` at the end.
-    const buffer = alloc(length + 1)
-    soljson.stringToUTF8(str, buffer, length + 1)
-    soljson.setValue(ptr, buffer, '*')
-  }
+function isOptimizerEnabled(input: Input): boolean {
+  return input.settings?.optimizer?.enabled || false
+}
 
-  // This is to support multiple versions of Emscripten.
-  // Take a single `ptr` and returns a `str`.
-  const copyFromCString = soljson.UTF8ToString || soljson.Pointer_stringify
+function translateSources(input: Input) {
+  const sources: Record<string, string> = {}
 
-  const wrapCallbackWithKind = (callback: { (kind: 'source' | 'smt-query', data: unknown): FunctionResult }) => {
-    assert(typeof callback === 'function', 'Invalid callback specified.')
-    return (context: number, kind: unknown, data: string, contents: string, error: string) => {
-      // Must be a null pointer.
-      assert(context === 0, 'Callback context must be null.')
-      const result = callback(copyFromCString(kind), copyFromCString(data))
-      if (typeof result.contents === 'string') copyToCString(result.contents, contents)
-      if (typeof result.error === 'string') copyToCString(result.error, error)
+  for (const source in input.sources) {
+    if (input.sources[source].content !== null) {
+      sources[source] = input.sources[source].content
+    } else {
+      // force failure
+      return null
     }
   }
 
-  // This calls compile() with args || cb
-  const runWithCallbacks = (
-    callbacks: Record<string, (arg: unknown) => any>,
-    compile: (...args: unknown[]) => any,
-    args: unknown[]
-  ) => {
-    if (callbacks) assert(typeof callbacks === 'object', 'Invalid callback object specified.')
-    else callbacks = {}
+  return sources
+}
 
-    const readCallback = callbacks.import || (() => ({ error: 'File import callback not supported' }))
+function librariesSupplied(input: Input) {
+  if (!isNil(input.settings)) return input.settings.libraries
+}
 
-    let singleCallback
-
-    // After 0.6.x multiple kind of callbacks are supported.
-    const smtSolverCallback = callbacks.smtSolver || (() => ({ error: 'SMT solver callback not supported' }))
-
-    singleCallback = (kind: 'source' | 'smt-query', data: unknown) => {
-      if (kind === 'source') return readCallback(data)
-      else if (kind === 'smt-query') return smtSolverCallback(data)
-      else assert(false, 'Invalid callback kind specified.')
-    }
-
-    singleCallback = wrapCallbackWithKind(singleCallback)
-
-    // This is to support multiple versions of Emscripten.
-    const addFunction = soljson.addFunction || soljson.Runtime.addFunction
-    const removeFunction = soljson.removeFunction || soljson.Runtime.removeFunction
-
-    const cb = addFunction(singleCallback, 'viiiii')
-    let output
-    try {
-      args.push(cb)
-      args.push(null) // Callback context.
-      output = compile.apply(undefined, args)
-    } catch (e) {
-      removeFunction(cb)
-      throw e
-    }
-    removeFunction(cb)
-    if (reset) reset()
-
-    return output
+function compileStandardWrapper(compile: CompileBindings, inputRaw: string, readCallback: unknown) {
+  if (!isNil(compile.compileStandard)) {
+    return compile.compileStandard(inputRaw, readCallback as number)
   }
 
-  let compileJSON: ((arg0: string, arg1: unknown) => string) | null = null
-  if ('_compileJSON' in soljson) {
-    // input (text), optimize (bool) -> output (jsontext)
-    compileJSON = soljson.cwrap('compileJSON', 'string', ['string', 'number'])
+  let input: Omit<Input, 'sources'> & { sources: string[] }
+
+  try {
+    input = JSON.parse(inputRaw)
+  } catch (e) {
+    return formatFatalError(`Invalid JSON supplied: ${e.message}`)
   }
 
-  let compileJSONMulti: ((arg0: string, arg1: unknown) => string) | null = null
-  if ('_compileJSONMulti' in soljson) {
-    // input (jsontext), optimize (bool) -> output (jsontext)
-    compileJSONMulti = soljson.cwrap('compileJSONMulti', 'string', ['string', 'number'])
+  if (input.language !== 'Solidity') {
+    return formatFatalError('Only "Solidity" is supported as a language.')
   }
 
-  let compileJSONCallback: {
-    (input: unknown, optimize: boolean, readCallback: Record<string, (...args: unknown[]) => any>): unknown
-  } | null = null
-  if ('_compileJSONCallback' in soljson) {
-    // input (jsontext), optimize (bool), callback (ptr) -> output (jsontext)
-    const compileInternal = soljson.cwrap('compileJSONCallback', 'string', ['string', 'number', 'number'])
-    compileJSONCallback = (input, optimize, readCallback) =>
-      runWithCallbacks(readCallback, compileInternal, [input, optimize])
+  // NOTE: this is deliberately `== null`
+  if (isNil(input.sources) || input.sources.length === 0) {
+    return formatFatalError('No input sources specified.')
   }
 
-  let compileStandard: {
-    (arg0: string, arg1: any): string
-  } | null = null
-  if ('_compileStandard' in soljson) {
-    // input (jsontext), callback (ptr) -> output (jsontext)
-    const compileStandardInternal = soljson.cwrap('compileStandard', 'string', ['string', 'number'])
-    compileStandard = (input, readCallback) => runWithCallbacks(readCallback, compileStandardInternal, [input])
-  }
-  if ('_solidity_compile' in soljson) {
-    const solidityCompile = soljson.cwrap('solidity_compile', 'string', ['string', 'number', 'number'])
+  const sources = translateSources(input as unknown as Input)
+  const optimize = isOptimizerEnabled(input as unknown as Input)
+  const libraries = librariesSupplied(input as unknown as Input)
 
-    compileStandard = (input, callbacks) => runWithCallbacks(callbacks, solidityCompile, [input])
+  if (isNil(sources) || Object.keys(sources!).length === 0) {
+    return formatFatalError('Failed to process sources.')
   }
 
-  // Expects a Standard JSON I/O but supports old compilers
-  const compileStandardWrapper = (_input: string, readCallback?: unknown): string => {
-    if (compileStandard !== null) return compileStandard(_input, readCallback)
-
-    function formatFatalError(message: string) {
-      return JSON.stringify({
-        errors: [
-          {
-            type: 'JSONError',
-            component: 'solcjs',
-            severity: 'error',
-            message,
-            formattedMessage: `Error: ${message}`
-          }
-        ]
-      })
-    }
-
-    let input: Input
-
-    try {
-      input = JSON.parse(_input)
-    } catch (e) {
-      return formatFatalError(`Invalid JSON supplied: ${e.message}`)
-    }
-
-    // NOTE: this is deliberately `== null`
-    if (input.sources == null || Object.keys(input.sources).length === 0)
-      return formatFatalError('No input sources specified.')
-
-    function translateSources(input: Input) {
-      const sources: Record<string, string> = {}
-      for (const source in input.sources) {
-        if (input.sources[source].content !== null) {
-          sources[source] = input.sources[source].content
-        } else return null // force failure
-      }
-      return sources
-    }
-
-    const sources = translateSources(input)
-    if (sources === null || Object.keys(sources).length === 0) return formatFatalError('Failed to process sources.')
-
-    return formatFatalError('Compiler does not support any known interface.')
+  // Try to wrap around old versions
+  if (!isNil(compile.compileJsonCallback)) {
+    const inputJson = JSON.stringify({ sources: sources })
+    const output = compile.compileJsonCallback(inputJson, optimize, readCallback as number)
+    return translateOutput(output, libraries)
   }
+
+  if (!isNil(compile.compileJsonMulti)) {
+    const output = compile.compileJsonMulti(JSON.stringify({ sources: sources }), optimize)
+    return translateOutput(output, libraries)
+  }
+
+  return formatFatalError('Compiler does not support any known interface.')
+}
+
+export function wrapper(soljson: SolJson): Omit<Wrapper, 'loadRemoteVersion' | 'setupMethods'> {
+  const { coreBindings, compileBindings, methodFlags } = setupBindings(soljson) as {
+    coreBindings: CoreBindings
+    compileBindings: CompileBindings
+    methodFlags: SupportedMethods
+  }
+
   return {
-    version,
-    license,
+    version: coreBindings.version,
+    semver: coreBindings.versionToSemver,
+    license: coreBindings.license,
     lowlevel: {
-      compileSingle: compileJSON,
-      compileMulti: compileJSONMulti,
-      compileCallback: compileJSONCallback,
-      compileStandard
+      compileSingle: compileBindings.compileJson,
+      compileMulti: compileBindings.compileJsonMulti,
+      compileCallback: compileBindings.compileJsonCallback,
+      compileStandard: compileBindings.compileStandard,
     },
     features: {
-      legacySingleInput: compileJSON !== null,
-      multipleInputs: compileJSONMulti !== null || compileStandard !== null,
-      importCallback: compileJSONCallback !== null || compileStandard !== null,
-      nativeStandardJSON: compileStandard !== null
+      legacySingleInput: methodFlags.compileJsonStandardSupported,
+      multipleInputs: methodFlags.compileJsonMultiSupported || methodFlags.compileJsonStandardSupported,
+      importCallback: methodFlags.compileJsonCallbackSupported || methodFlags.compileJsonStandardSupported,
+      nativeStandardJSON: methodFlags.compileJsonStandardSupported,
     },
-    compile: compileStandardWrapper
+    // @ts-ignore this stuff
+    compile: compileStandardWrapper.bind(this, compileBindings),
   }
 }

@@ -1,14 +1,4 @@
-export type LegacyAssemblyCode = {
-  begin: number
-  end: number
-  name: string
-  source: number
-  value?: string
-}
-
-export type Assembly = string | null | undefined | { '.code': LegacyAssemblyCode[]; '.data': any[] }
-
-export type FunctionResult = { contents: string; error: string }
+import { LibraryAddresses } from './deps.ts'
 
 export type Input = {
   language: 'Solidity' | 'Yul'
@@ -20,28 +10,32 @@ export type Input = {
     }>
 
     outputSelection: Record<string, Record<string, string[]>>
-    libraries: Record<string, any>
+    libraries: LibraryAddresses
   }>
 }
 
-export type GasEstimates = Partial<{
-  creation: { codeDepositCost: string; executionCost: string; totalCost: string }
-  internal: any
-  external: Record<string, string>
-}>
-
-export type Contract = {
-  gasEstimates: GasEstimates
-  interface: string
-  metadata: string
-  assembly: string
-  bytecode: string
-  opcodes: string
-  srcmap: any
-  runtimeBytecode: string
-  srcmapRuntime: string
-  functionHashes: Record<string, string>
+export type LegacyAssemblyCode = {
+  begin: number
+  end: number
+  name: string
+  source: number
+  value?: string
 }
+
+export type Assembly = string | null | undefined | { '.code': LegacyAssemblyCode[]; '.data': any[] }
+
+export type GeneratedSources = {
+  ast: YulAST
+  contents: string
+  id: number
+  language: string
+  name: string
+}[]
+
+export type FunctionDebugData = Record<
+  string,
+  { entryPoint: number | null; id: number | null; parameterSlots: number; returnSlots: number }
+>
 
 export type CompilationError = {
   component: 'general' | string
@@ -83,18 +77,18 @@ export type YulAST = {
   statements: Statement[]
 }
 
-export type GeneratedSources = {
-  ast: YulAST
-  contents: string
-  id: number
-  language: string
-  name: string
-}[]
-
-export type FunctionDebugData = Record<
+export type DocMethods = Record<
   string,
-  { entryPoint: number | null; id: number | null; parameterSlots: number; returnSlots: number }
+  {
+    details: string
+    params: Record<string, string>
+  }
 >
+export type GasEstimates = Partial<{
+  creation: { codeDepositCost: string; executionCost: string; totalCost: string }
+  internal: any
+  external: Record<string, string>
+}>
 
 export type ContractEVM = {
   assembly: string
@@ -126,14 +120,6 @@ export type ContractEVM = {
   methodIdentifiers: Record<string, string>
 }
 
-export type DocMethods = Record<
-  string,
-  {
-    details: string
-    params: Record<string, string>
-  }
->
-
 export type CompiledContract = {
   abi: ABI[]
   devdoc: { kind: string; methods: DocMethods; version: 1 }
@@ -159,7 +145,5 @@ export type Output = {
   errors: CompilationError[]
   contracts: Record<string, Record<string, CompiledContract>>
   sourceList?: string[]
-  sources: Record<string, { id: number; AST?: any }>
+  sources?: Record<string, { id: number; AST?: any }>
 }
-
-export type LinkReferences = Record<string, { start: number; length: number }[]>
