@@ -1,13 +1,12 @@
 import {
   CompileBindings,
   CoreBindings,
-  createRequire,
   LibraryAddresses,
   setupBindings,
   SolJson,
   SupportedMethods,
   translateJsonCompilerOutput,
-  Wrapper,
+  Wrapper
 } from './deps.ts'
 import type { Input } from './types.ts'
 
@@ -19,9 +18,9 @@ function formatFatalError(message: string) {
         component: 'solcjs',
         severity: 'error',
         message: message,
-        formattedMessage: 'Error: ' + message,
-      },
-    ],
+        formattedMessage: 'Error: ' + message
+      }
+    ]
   })
 }
 
@@ -115,6 +114,10 @@ function compileStandardWrapper(compile: CompileBindings, inputRaw: string, read
   return formatFatalError('Compiler does not support any known interface.')
 }
 
+/**
+ * Wrap Solidity compiler into a JS interface
+ * @param soljson WebAssembly compiler module
+ */
 export function wrapper(soljson: SolJson): Omit<Wrapper, 'loadRemoteVersion' | 'setupMethods'> {
   const { coreBindings, compileBindings, methodFlags } = setupBindings(soljson) as {
     coreBindings: CoreBindings
@@ -130,15 +133,15 @@ export function wrapper(soljson: SolJson): Omit<Wrapper, 'loadRemoteVersion' | '
       compileSingle: compileBindings.compileJson,
       compileMulti: compileBindings.compileJsonMulti,
       compileCallback: compileBindings.compileJsonCallback,
-      compileStandard: compileBindings.compileStandard,
+      compileStandard: compileBindings.compileStandard
     },
     features: {
       legacySingleInput: methodFlags.compileJsonStandardSupported,
       multipleInputs: methodFlags.compileJsonMultiSupported || methodFlags.compileJsonStandardSupported,
       importCallback: methodFlags.compileJsonCallbackSupported || methodFlags.compileJsonStandardSupported,
-      nativeStandardJSON: methodFlags.compileJsonStandardSupported,
+      nativeStandardJSON: methodFlags.compileJsonStandardSupported
     },
     // @ts-ignore this stuff
-    compile: compileStandardWrapper.bind(this, compileBindings),
+    compile: compileStandardWrapper.bind(this, compileBindings)
   }
 }

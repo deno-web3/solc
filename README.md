@@ -8,8 +8,6 @@
 
 </div>
 
-> ⚠️ Highly experimental!
-
 Solidity bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-js).
 
 Solidity 0.7+ is supported.
@@ -21,23 +19,46 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme).
 ## Example
 
 ```ts
+import { setupSolc } from 'https://deno.land/x/solc/mod.ts'
+import { Input } from 'https://deno.land/x/solc/types.ts'
 import { download } from 'https://deno.land/x/solc/download.ts'
-import { setupMethods } from 'https://deno.land/x/solc/wrapper.ts'
-import 'https://deno.land/x/solc/process.ts'
-import { createRequire } from 'https://deno.land/std@0.108.0/node/module.ts'
-import { exists } from 'https://deno.land/x/solc/utils.ts'
+import 'https://deno.land/x/solc/env.ts'
 
-if (!(await exists('./soljson.js'))) download('./soljson.js')
+const exists = async (filename: string): Promise<boolean> => {
+  try {
+    await Deno.stat(filename)
+    return true
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return false
+    } else {
+      throw error
+    }
+  }
+}
 
-const require = createRequire(import.meta.url)
+if (!(await exists('./soljson.js'))) await download('./soljson.js')
 
-const solc = setupMethods(require('./soljson.js'))
+const dec = new TextDecoder()
 
-const input = {
+const solc = setupSolc('./soljson.js')
+
+const readFile = async (path: string) => {
+  const file = await Deno.readFile(path)
+  return dec.decode(file)
+}
+
+const MyToken = await readFile('./MyToken.sol')
+const ERC20 = await readFile('./ERC20.sol')
+
+const input: Input = {
   language: 'Solidity',
   sources: {
-    'test.sol': {
-      content: 'contract C { function f() public { } }'
+    'MyToken.sol': {
+      content: MyToken
+    },
+    'ERC20.sol': {
+      content: ERC20
     }
   },
   settings: {
@@ -51,21 +72,14 @@ const input = {
 
 const result = JSON.parse(solc.compile(JSON.stringify(input)))
 
-const { contracts } = result
-
-// `output` here contains the JSON output as specified in the documentation
-for (const contractName in contracts['test.sol']) {
-  console.log(`${contractName}: ${contracts['test.sol'][contractName].evm.bytecode.object}`)
-}
+console.log(result)
 ```
 
 And then run with
 
 ```sh
-deno run -A --unstable --no-check mod.js
+deno run -A --unstable --no-check mod.ts
 ```
-
-See [example](https://github.com/deno-web3/solc/tree/master/example) for a more advanced example.
 
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/deno-web3/solc?style=for-the-badge&color=626890&
 [code-quality]: https://www.codefactor.io/repository/github/deno-web3/solc
