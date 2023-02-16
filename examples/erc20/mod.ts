@@ -2,24 +2,9 @@ import { setupSolc } from 'solc'
 import { Input } from 'solc/types'
 import { download } from 'solc/download'
 import 'solc/env'
+import { exists } from '../../test_helpers.ts'
 
-const exists = async (filename: string): Promise<boolean> => {
-  try {
-    await Deno.stat(filename)
-    // successful, file or directory must exist
-    return true
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      // file or directory does not exist
-      return false
-    } else {
-      // unexpected error, maybe permissions, pass it along
-      throw error
-    }
-  }
-}
-
-if (!(await exists('./soljson.js'))) await download('./soljson.js')
+if (!(await exists('./soljson.js'))) await download()
 
 const dec = new TextDecoder()
 
