@@ -1,11 +1,13 @@
 {
   "deno.enable": true,
   "deno.lint": true,
+  
   "deno.config": "./deno.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land/x/": true,
     "https://x.nest.land/": true,
     "https://esm.sh": false
   },
-  "prettier.enable": false
+  "prettier.enable": false,
+  "editor.formatOnSave": true
 }

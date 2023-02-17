@@ -1,9 +1,9 @@
-import type { LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
+import type { CoreBindings as Bindings, LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
 
 export type Input = {
   language: 'Solidity' | 'Yul'
   sources: Record<string, { content: string }>
-  settings: Partial<{
+  settings?: Partial<{
     optimizer: Partial<{
       enabled: boolean
       runs: number
@@ -148,4 +148,16 @@ export type Output = {
   sources?: Record<string, { id: number; AST?: any }>
 }
 
-export type Wrapper = Omit<SolcWrapper, 'loadRemoteVersion' | 'setupMethods'>
+export type Wrapper = Pick<SolcWrapper, 'license' | 'compile' | 'version' | 'loadRemoteVersion'>
+
+export type CoreBindings =
+  & Omit<Bindings, 'versionToSemver' | 'isVersion6OrNewer' | 'copyFromCString' | 'copyToCString'>
+  & {
+    copyFromCString: (ptr: number) => string
+    copyToCString: (input: string, ptr: number) => string
+  }
+
+export type Callbacks = Partial<{
+  import: (data: unknown) => void
+  smtSolver: (data: string) => void
+}>

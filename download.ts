@@ -7,9 +7,11 @@ import { copy, readerFromStreamReader } from './deps.ts'
  */
 export const download = async (path = './soljson.js', version?: string) => {
   console.log(`Fetching releases...`)
-  const { releases, latestRelease } = (await fetch('https://solc-bin.ethereum.org/bin/list.json').then((res) =>
-    res.json()
-  )) as { releases: Record<string, string>; latestRelease: string }
+  const { releases, latestRelease } =
+    (await fetch('https://solc-bin.ethereum.org/bin/list.json').then((res) => res.json())) as {
+      releases: Record<string, string>
+      latestRelease: string
+    }
 
   const jsFile: string = releases[version || latestRelease]
 

@@ -1,14 +1,15 @@
-import { setupSolc } from 'solc'
+import { wrapper } from 'solc'
 import { Input } from 'solc/types'
 import { download } from 'solc/download'
-
+import { createRequire } from '../../helpers_test.ts'
 import { exists } from '../../helpers_test.ts'
 
 if (!(await exists('./soljson.js'))) await download()
 
 const dec = new TextDecoder()
 
-const solc = setupSolc('./soljson.js')
+const require = createRequire(import.meta.url)
+const solc = wrapper(require('./soljson.js'))
 
 const readFile = async (path: string) => {
   const file = await Deno.readFile(path)
