@@ -142,14 +142,7 @@ const bindCompileJson = (solJson: SolJson) =>
     null,
   )
 
-const bindCompileJsonMulti = (solJson: SolJson) =>
-  bindSolcMethod(
-    solJson,
-    'compileJSONMulti',
-    'string',
-    ['string', 'number'],
-    null,
-  )
+
 
 function wrapCallbackWithKind(
   coreBindings: CoreBindings,
@@ -172,7 +165,6 @@ function wrapCallbackWithKind(
 
 // calls compile() with args || cb
 function runWithCallbacks(
-  solJson: SolJson,
   coreBindings: CoreBindings,
   callbacks: Callbacks = {},
   compile: (...args: unknown[]) => void,
@@ -187,7 +179,7 @@ function runWithCallbacks(
     }
   }
 
-  let singleCallback = wrapCallbackWithKind(coreBindings, (kind: string, data: string) => {
+  const singleCallback = wrapCallbackWithKind(coreBindings, (kind: string, data: string) => {
     if (kind === 'source') {
       return readCallback!(data)!
     } else if (kind === 'smt-query') {
@@ -228,22 +220,6 @@ function runWithCallbacks(
   return output
 }
 
-const bindCompileJsonCallback = (solJson: SolJson, coreBindings: CoreBindings) => {
-  const compileInternal = bindSolcMethod(
-    solJson,
-    'compileJSONCallback',
-    'string',
-    ['string', 'number', 'number'],
-    null,
-  )
-
-  if (isNil(compileInternal)) return null
-
-  return function (input: number, optimize: number, readCallback: Callbacks) {
-    return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal!, [input, optimize])
-  }
-}
-
 function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
   let boundFunctionStandard: any = null
   let boundFunctionSolidity: any = null
@@ -265,16 +241,17 @@ function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
     ['string', 'number', 'number'],
     null,
   )
+  
 
   if (!isNil(compileInternal)) {
     boundFunctionStandard = function (input: number, readCallback: Callbacks) {
-      return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal!, [input])
+      return runWithCallbacks( coreBindings, readCallback, compileInternal!, [input])
     }
   }
 
   if (!isNil(boundFunctionSolidity)) {
     boundFunctionStandard = function (input: number, callbacks: Callbacks) {
-      return runWithCallbacks(solJson, coreBindings, callbacks, boundFunctionSolidity, [input])
+      return runWithCallbacks( coreBindings, callbacks, boundFunctionSolidity, [input])
     }
   }
 
@@ -287,8 +264,6 @@ function setupCompile(
 ) {
   return {
     compileJson: bindCompileJson(solJson),
-    compileJsonCallback: bindCompileJsonCallback(solJson, core),
-    compileJsonMulti: bindCompileJsonMulti(solJson),
     compileStandard: bindCompileStandard(solJson, core),
   }
 }
