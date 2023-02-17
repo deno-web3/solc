@@ -13,9 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
+          restore-keys: ${{ runner.os }}-deno-
+          path: /home/runner/.cache/deno/deps/https/deno.land
+
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+
+      - name: fetch any uncached dependencies
+        run: |
+          deno cache --reload=file: ./mod.ts
+
       - name: Run tests
         run: deno task test
       - name: Create coverage report
