@@ -14,7 +14,7 @@ Solidity 0.7+ is supported.
 
 ## Docs
 
-See [solc-js README](https://github.com/ethereum/solc-js#readme) and [Deno doc](https://deno.land/x/solc@1.0.6/mod.ts).
+See [solc-js README](https://github.com/ethereum/solc-js#readme) and [Deno doc](https://deno.land/x/solc/mod.ts).
 
 ## Example
 
