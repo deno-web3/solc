@@ -142,8 +142,6 @@ const bindCompileJson = (solJson: SolJson) =>
     null,
   )
 
-
-
 function wrapCallbackWithKind(
   coreBindings: CoreBindings,
   callback: (arg1: string, arg2: string) => { contents: string; error: string },
@@ -241,17 +239,16 @@ function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
     ['string', 'number', 'number'],
     null,
   )
-  
 
   if (!isNil(compileInternal)) {
     boundFunctionStandard = function (input: number, readCallback: Callbacks) {
-      return runWithCallbacks( coreBindings, readCallback, compileInternal!, [input])
+      return runWithCallbacks(coreBindings, readCallback, compileInternal!, [input])
     }
   }
 
   if (!isNil(boundFunctionSolidity)) {
     boundFunctionStandard = function (input: number, callbacks: Callbacks) {
-      return runWithCallbacks( coreBindings, callbacks, boundFunctionSolidity, [input])
+      return runWithCallbacks(coreBindings, callbacks, boundFunctionSolidity, [input])
     }
   }
 
