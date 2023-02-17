@@ -45,7 +45,7 @@ function compileStandardWrapper(compile: CompileBindings, inputRaw: string, read
  * @param soljson WebAssembly compiler module
  */
 export function wrapper(soljson: SolJson): Wrapper {
-  const { coreBindings,compileBindings } = setupBindings(soljson)
+  const { coreBindings, compileBindings } = setupBindings(soljson)
 
   return {
     version: coreBindings.version,

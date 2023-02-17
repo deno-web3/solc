@@ -4,7 +4,7 @@
 
 import { isNil } from './common.ts'
 import { Alloc, License, Reset, SolJson, Version } from './deps.ts'
-import type { Callbacks, CoreBindings, } from './types.ts'
+import type { Callbacks, CoreBindings } from './types.ts'
 
 function bindSolcMethod(
   solJson: SolJson,
@@ -206,7 +206,6 @@ function runWithCallbacks(
     }
   }
 
-
   const cb = coreBindings.addFunction(singleCallback, 'viiiii')
   let output
   try {
@@ -245,9 +244,9 @@ const bindCompileJsonCallback = (solJson: SolJson, coreBindings: CoreBindings) =
   }
 }
 
-function bindCompileStandard (solJson: SolJson, coreBindings: CoreBindings) {
-  let boundFunctionStandard: any = null;
-  let boundFunctionSolidity: any = null;
+function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
+  let boundFunctionStandard: any = null
+  let boundFunctionSolidity: any = null
 
   // input (jsontext), callback (ptr) -> output (jsontext)
   const compileInternal = bindSolcMethod(
@@ -255,32 +254,31 @@ function bindCompileStandard (solJson: SolJson, coreBindings: CoreBindings) {
     'compileStandard',
     'string',
     ['string', 'number'],
-    null
-  );
+    null,
+  )
 
-    // input (jsontext), callback (ptr), callback_context (ptr) -> output (jsontext)
-    boundFunctionSolidity = bindSolcMethod(
-      solJson,
-      'solidity_compile',
-      'string',
-      ['string', 'number', 'number'],
-      null
-    );
- 
+  // input (jsontext), callback (ptr), callback_context (ptr) -> output (jsontext)
+  boundFunctionSolidity = bindSolcMethod(
+    solJson,
+    'solidity_compile',
+    'string',
+    ['string', 'number', 'number'],
+    null,
+  )
 
   if (!isNil(compileInternal)) {
     boundFunctionStandard = function (input: number, readCallback: Callbacks) {
-      return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal!, [input]);
-    };
+      return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal!, [input])
+    }
   }
 
   if (!isNil(boundFunctionSolidity)) {
     boundFunctionStandard = function (input: number, callbacks: Callbacks) {
-      return runWithCallbacks(solJson, coreBindings, callbacks, boundFunctionSolidity, [input]);
-    };
+      return runWithCallbacks(solJson, coreBindings, callbacks, boundFunctionSolidity, [input])
+    }
   }
 
-  return boundFunctionStandard;
+  return boundFunctionStandard
 }
 
 function setupCompile(
