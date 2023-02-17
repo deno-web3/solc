@@ -1,6 +1,4 @@
 export { copy, readerFromStreamReader } from 'https://deno.land/std@0.177.0/streams/mod.ts'
-export { process } from 'https://deno.land/std@0.177.0/node/process.ts'
-export { assert } from 'https://deno.land/std@0.177.0/testing/asserts.ts'
 export { translateJsonCompilerOutput } from 'https://esm.sh/v106/solc@0.8.18/es2022/translate.js'
 export type {
   Alloc,

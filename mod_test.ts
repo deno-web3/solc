@@ -21,12 +21,12 @@ describe('solc/wrapper.ts', () => {
     await download('./soljson_test.js', '0.8.18')
     solc = wrapper(require('./soljson_test.js'))
   })
-  it('returns JS interface', async () => {
+  it('returns JS interface', () => {
     expect(solc.compile).toBeDefined()
     expect(solc.version()).toBe('0.8.18+commit.87f61d96.Emscripten.clang')
     expect(solc.license()).toContain('Most of the code is licensed under GPLv3 (see below), the license for individual')
   })
-  it('compiles a Solidity file', async () => {
+  it('compiles a Solidity file', () => {
     const input: Input = {
       language: 'Solidity',
       sources: {

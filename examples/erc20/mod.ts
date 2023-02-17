@@ -23,19 +23,19 @@ const input: Input = {
   language: 'Solidity',
   sources: {
     'MyToken.sol': {
-      content: MyToken
+      content: MyToken,
     },
     'ERC20.sol': {
-      content: ERC20
-    }
+      content: ERC20,
+    },
   },
   settings: {
     outputSelection: {
       '*': {
-        '*': ['*']
-      }
-    }
-  }
+        '*': ['*'],
+      },
+    },
+  },
 }
 
 const result = JSON.parse(solc.compile(JSON.stringify(input)))
