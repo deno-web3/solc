@@ -19,9 +19,10 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme) and [Deno doc](
 ## Example
 
 ```ts
-import { setupSolc } from 'https://deno.land/x/solc/mod.ts'
+import { wrapper } from 'https://deno.land/x/solc/mod.ts'
 import { Input } from 'https://deno.land/x/solc/types.ts'
 import { download } from 'https://deno.land/x/solc/download.ts'
+import { createRequire } from 'https://deno.land/std@0.177.0/node/module.ts'
 
 const exists = async (filename: string): Promise<boolean> => {
   try {
@@ -40,7 +41,8 @@ if (!(await exists('./soljson.js'))) await download('./soljson.js')
 
 const dec = new TextDecoder()
 
-const solc = setupSolc('./soljson.js')
+const require = createRequire(import.meta.url)
+const solc = wrapper(require('./soljson.js'))
 
 const readFile = async (path: string) => {
   const file = await Deno.readFile(path)
