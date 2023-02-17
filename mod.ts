@@ -1,5 +1,5 @@
 import { setupBindings } from './bindings.ts'
-import { CompileBindings,  SolJson } from './deps.ts'
+import { CompileBindings, SolJson } from './deps.ts'
 import type { Wrapper } from './types.ts'
 
 function compileStandardWrapper(compile: CompileBindings, inputRaw: string, readCallback: unknown) {

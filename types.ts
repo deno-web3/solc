@@ -22,7 +22,13 @@ export type LegacyAssemblyCode = {
   value?: string
 }
 
-export type Assembly = string | null | undefined | { '.code': LegacyAssemblyCode[]; '.data': any[] }
+export type Assembly = string | null | undefined | {
+  '.code': LegacyAssemblyCode[]
+  '.data': {
+    '.auxdata': string
+    '.code': LegacyAssemblyCode[]
+  }
+}
 
 export type GeneratedSources = {
   ast: YulAST
@@ -86,7 +92,7 @@ export type DocMethods = Record<
 >
 export type GasEstimates = Partial<{
   creation: { codeDepositCost: string; executionCost: string; totalCost: string }
-  internal: any
+  internal: Record<string, string>
   external: Record<string, string>
 }>
 
@@ -122,7 +128,7 @@ export type ContractEVM = {
 
 export type CompiledContract = {
   abi: ABI[]
-  devdoc: { kind: string; methods: DocMethods; version: 1 }
+  devdoc: { kind: string; methods: DocMethods; version: 1; author: string }
   evm: ContractEVM
   ewasm: { wasm: string }
   metadata: string
