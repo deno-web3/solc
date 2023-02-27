@@ -14,4 +14,4 @@ export const exists = async (filename: string): Promise<boolean> => {
   }
 }
 
-export { createRequire } from 'https://deno.land/std@0.178.0/node/module.ts'
+export { createRequire } from 'https://deno.land/std@0.177.0/node/module.ts'
