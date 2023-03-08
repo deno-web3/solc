@@ -1,6 +1,6 @@
 import type { CoreBindings as Bindings, LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
 
-const selectionTypes =  ['*', 'metadata', 'evm', 'evm.bytecode', 'evm.bytecode.sourceMap', 'ast'] as const
+const selectionTypes = ['*', 'metadata', 'evm', 'evm.bytecode', 'evm.bytecode.sourceMap', 'ast'] as const
 
 type OutputSelection = typeof selectionTypes[number]
 

@@ -4,7 +4,8 @@
 
 # solc
 
-[![nest badge][nest-badge]](https://nest.land/package/solc) [![GitHub Workflow Status][gh-actions-img]][github-actions] [![Codecov][cov-badge-url]][cov-url] [![][code-quality-img]][code-quality]
+[![nest badge][nest-badge]](https://nest.land/package/solc) [![GitHub Workflow Status][gh-actions-img]][github-actions]
+[![Codecov][cov-badge-url]][cov-url] [![][code-quality-img]][code-quality]
 
 </div>
 
@@ -36,19 +37,19 @@ const input: Input = {
   language: 'Solidity',
   sources: {
     'MyToken.sol': {
-      content: MyToken
+      content: MyToken,
     },
     'ERC20.sol': {
-      content: ERC20
-    }
+      content: ERC20,
+    },
   },
   settings: {
     outputSelection: {
       '*': {
-        '*': ['*']
-      }
-    }
-  }
+        '*': ['*'],
+      },
+    },
+  },
 }
 console.log(JSON.parse(solc.compile(JSON.stringify(input))))
 ```
