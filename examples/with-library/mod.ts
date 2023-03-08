@@ -6,18 +6,11 @@ import { exists } from '../../helpers_test.ts'
 
 if (!(await exists('./soljson.js'))) await download()
 
-const dec = new TextDecoder()
-
 const require = createRequire(import.meta.url)
 const solc = wrapper(require('./soljson.js'))
 
-const readFile = async (path: string) => {
-  const file = await Deno.readFile(path)
-  return dec.decode(file)
-}
-
-const Example = await readFile('./Example.sol')
-const LibString = await readFile('./LibString.sol')
+const Example = await Deno.readTextFile('./Example.sol')
+const LibString = await Deno.readTextFile('./LibString.sol')
 
 const input: Input = {
   language: 'Solidity',

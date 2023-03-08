@@ -22,7 +22,7 @@
     "solc": "./mod.ts",
     "solc/download": "./download.ts",
     "solc/types": "./types.ts",
-    "solc/env": "./env.ts"
+    "solc/url_resolver": "./url_resolver.ts"
   },
   "test": {
     "files": {

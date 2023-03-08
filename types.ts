@@ -1,17 +1,49 @@
 import type { CoreBindings as Bindings, LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
 
-export type Input = {
-  language: 'Solidity' | 'Yul'
-  sources: Record<string, { content: string }>
-  settings?: Partial<{
-    optimizer: Partial<{
-      enabled: boolean
-      runs: number
-    }>
+const selectionTypes =  ['*', 'metadata', 'evm', 'evm.bytecode', 'evm.bytecode.sourceMap', 'ast'] as const
 
-    outputSelection: Record<string, Record<string, string[]>>
-    libraries: LibraryAddresses
+type OutputSelection = typeof selectionTypes[number]
+
+export type InputSettings = Partial<{
+  remappings: string[]
+  optimizer: Partial<{
+    enabled: boolean
+    runs: number
+    details: {
+      peephole: boolean
+      jumpdestRemover: boolean
+      deduplicate: boolean
+      orderLiterals: boolean
+      cse: boolean
+      constantOptimizer: boolean
+      yul: boolean
+      yulDetails: {
+        /**
+         * Improve allocation of stack slots for variables, can free up stack slots early. ctivated by default if the Yul optimizer is activated.
+         */
+        stackAllocation: boolean
+        /**
+         * Select optimization steps to be applied.
+         * Optional, the optimizer will use the default sequence if omitted.
+         */
+        optimizerSteps: string
+      }
+    }
   }>
+  outputSelection: Record<string, Record<string, OutputSelection[]>>
+  libraries: LibraryAddresses
+}>
+
+export type Input = {
+  /**
+   * Source code language. Currently supported are "Solidity" and "Yul"
+   */
+  language: 'Solidity' | 'Yul'
+  sources: Record<
+    string,
+    { content: string; keccak256?: `0x${string}` } | { urls: string[]; keccak256?: `0x${string}` }
+  >
+  settings?: InputSettings
 }
 
 export type LegacyAssemblyCode = {
@@ -96,12 +128,14 @@ export type GasEstimates = Partial<{
   external: Record<string, string>
 }>
 
+export type LinkReferences = Record<string, Record<string, { length: number; start: number }[]>>
+
 export type ContractEVM = {
   assembly: string
   bytecode: {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
-    linkReferences: Record<string, string>[]
+    linkReferences: LinkReferences
     object: string
     opcodes: string
     sourceMap: string
@@ -110,7 +144,7 @@ export type ContractEVM = {
     functionDebugData: FunctionDebugData
     generatedSources: GeneratedSources
     immutableReferences: Record<string, { length: number; start: number }[]>
-    linkReferences: Record<string, string>[]
+    linkReferences: LinkReferences
   }
   gasEstimates: GasEstimates
   legacyAssembly: {

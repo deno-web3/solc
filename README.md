@@ -24,33 +24,13 @@ import { Input } from 'https://deno.land/x/solc/types.ts'
 import { download } from 'https://deno.land/x/solc/download.ts'
 import { createRequire } from 'https://deno.land/std@0.177.0/node/module.ts'
 
-const exists = async (filename: string): Promise<boolean> => {
-  try {
-    await Deno.stat(filename)
-    return true
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
-      return false
-    } else {
-      throw error
-    }
-  }
-}
+// Download latest Solidity compiler
+await download()
 
-if (!(await exists('./soljson.js'))) await download('./soljson.js')
+const solc = wrapper(createRequire(import.meta.url)('./soljson.js'))
 
-const dec = new TextDecoder()
-
-const require = createRequire(import.meta.url)
-const solc = wrapper(require('./soljson.js'))
-
-const readFile = async (path: string) => {
-  const file = await Deno.readFile(path)
-  return dec.decode(file)
-}
-
-const MyToken = await readFile('./MyToken.sol')
-const ERC20 = await readFile('./ERC20.sol')
+const MyToken = await Deno.readTextFile('./MyToken.sol')
+const ERC20 = await Deno.readTextFile('./ERC20.sol')
 
 const input: Input = {
   language: 'Solidity',
@@ -70,10 +50,7 @@ const input: Input = {
     }
   }
 }
-
-const result = JSON.parse(solc.compile(JSON.stringify(input)))
-
-console.log(result)
+console.log(JSON.parse(solc.compile(JSON.stringify(input))))
 ```
 
 And then run with

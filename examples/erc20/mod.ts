@@ -6,18 +6,11 @@ import { exists } from '../../helpers_test.ts'
 
 if (!(await exists('./soljson.js'))) await download()
 
-const dec = new TextDecoder()
-
 const require = createRequire(import.meta.url)
 const solc = wrapper(require('./soljson.js'))
 
-const readFile = async (path: string) => {
-  const file = await Deno.readFile(path)
-  return dec.decode(file)
-}
-
-const MyToken = await readFile('./MyToken.sol')
-const ERC20 = await readFile('./ERC20.sol')
+const MyToken = await Deno.readTextFile('./MyToken.sol')
+const ERC20 = await Deno.readTextFile('./ERC20.sol')
 
 const input: Input = {
   language: 'Solidity',
