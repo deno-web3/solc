@@ -13,7 +13,7 @@ Solidity bindings for Deno, based on [solc-js](https://github.com/ethereum/solc-
 
 Solidity 0.7+ is supported.
 
-For a CLI and a higher level API you can use [sol_build](https://github.com/deno-web3/sol_build)
+For a CLI and a higher level API you can use [sol_build](https://github.com/deno-web3/sol_build).
 
 ## Docs
 
