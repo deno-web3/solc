@@ -1,11 +1,12 @@
 import type { CoreBindings as Bindings, LibraryAddresses, Wrapper as SolcWrapper } from './deps.ts'
 
 // Taken from https://stackoverflow.com/a/68404823/11889402
-type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`
+type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`
 
-type DotNestedKeys<T> = (T extends object ?
-    { [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<DotNestedKeys<T[K]>>}` }[Exclude<keyof T, symbol>]
-    : "") extends infer D ? Extract<D, string> : never;
+type DotNestedKeys<T> =
+  (T extends object
+    ? { [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<DotNestedKeys<T[K]>>}` }[Exclude<keyof T, symbol>]
+    : '') extends infer D ? Extract<D, string> : never
 
 type OutputSelection = DotNestedKeys<Omit<CompiledContract, 'abi'>> | 'abi' | '*' | 'ast'
 
