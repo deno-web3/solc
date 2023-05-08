@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it, run } from 'https://deno.land/x/tincan@1.0.1/mod.ts'
+import { describe, expect, it, run } from 'https://deno.land/x/tincan@1.0.1/mod.ts'
 import { download } from 'solc/download'
 import { exists } from './helpers_test.ts'
 

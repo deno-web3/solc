@@ -6,17 +6,13 @@
     }
   },
   "fmt": {
-    "files": {
-      "include": ["./**/*.ts", "./**/*.md", "./**/*.json"],
-      "exclude": ["./**/*.js"]
-    },
-    "options": {
-      "singleQuote": true,
-      "semiColons": false,
-      "useTabs": false,
-      "indentWidth": 2,
-      "lineWidth": 120
-    }
+    "include": ["./**/*.ts", "./**/*.md", "./**/*.json"],
+    "exclude": ["./**/*.js"],
+    "singleQuote": true,
+    "semiColons": false,
+    "useTabs": false,
+    "indentWidth": 2,
+    "lineWidth": 120
   },
   "imports": {
     "solc": "./mod.ts",
@@ -25,9 +21,7 @@
     "solc/url_resolver": "./url_resolver.ts"
   },
   "test": {
-    "files": {
-      "exclude": ["./**/*.js", "examples"]
-    }
+    "exclude": ["./**/*.js", "examples"]
   },
   "tasks": {
     "test": "deno test --no-check --allow-net --allow-read --allow-write --coverage=coverage",
