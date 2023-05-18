@@ -8,11 +8,7 @@ global:
   # Git, trigger on these branches
   trigger:
     branch:
-      - main
-
-  # Environment variables
-  environment:
-    APP_ENV: production  # comment here about this var
+      - master
 
 jobs:
   # Init Deno
