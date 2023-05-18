@@ -1,0 +1,22 @@
+# .nosana-ci.yml
+nosana:
+  description: Nosana Deno Template
+
+global:
+  image: denoland/deno:latest
+
+  # Git, trigger on these branches
+  trigger:
+    branch:
+      - main
+
+  # Environment variables
+  environment:
+    APP_ENV: production  # comment here about this var
+
+jobs:
+  # Init Deno
+  - name: install
+    commands:
+      - deno cache --reload=file: ./mod.ts
+      - deno task test
