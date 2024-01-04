@@ -11,4 +11,4 @@ export const formatFatalError = (message: string) =>
     ],
   })
 
-export const isNil = (value: unknown) => value == null
+export const isNil = (value: unknown): value is null => value == null

@@ -3,7 +3,7 @@
  */
 
 import { isNil } from './common.ts'
-import { Alloc, License, Reset, SolJson, Version } from './deps.ts'
+import type { Alloc, License, Reset, SolJson, Version } from './deps.ts'
 import type { Callbacks, CoreBindings } from './types.ts'
 
 function bindSolcMethod(
@@ -219,8 +219,8 @@ function runWithCallbacks(
 }
 
 function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
-  let boundFunctionStandard: any = null
-  let boundFunctionSolidity: any = null
+  let boundFunctionStandard: ((input: number, readCallback: Callbacks) => void) | null = null
+  let boundFunctionSolidity: ((...args: unknown[]) => void) | null = null
 
   // input (jsontext), callback (ptr) -> output (jsontext)
   const compileInternal = bindSolcMethod(
@@ -248,7 +248,7 @@ function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
 
   if (!isNil(boundFunctionSolidity)) {
     boundFunctionStandard = function (input: number, callbacks: Callbacks) {
-      return runWithCallbacks(coreBindings, callbacks, boundFunctionSolidity, [input])
+      return runWithCallbacks(coreBindings, callbacks, boundFunctionSolidity as ((...args: unknown[]) => void), [input])
     }
   }
 

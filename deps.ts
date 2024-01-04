@@ -1,4 +1,4 @@
-export { copy, readerFromStreamReader } from 'https://deno.land/std@0.187.0/streams/mod.ts'
+export { copy, readerFromStreamReader } from 'https://deno.land/std@0.210.0/streams/mod.ts'
 export type {
   Alloc,
   Callbacks,

@@ -7,5 +7,8 @@
     "https://x.nest.land/": true,
     "https://esm.sh": false
   },
-  "prettier.enable": false
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "editor.formatOnSave": true
 }
