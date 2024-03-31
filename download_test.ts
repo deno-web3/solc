@@ -1,5 +1,5 @@
-import { describe, it } from 'https://deno.land/std@0.210.0/testing/bdd.ts'
-import { expect } from 'https://deno.land/std@0.210.0/expect/mod.ts'
+import { describe, it } from 'https://deno.land/std@0.221.0/testing/bdd.ts'
+import { expect } from 'https://deno.land/std@0.221.0/expect/mod.ts'
 import { download } from 'solc/download'
 import { exists } from './helpers_test.ts'
 
