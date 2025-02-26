@@ -1,5 +1,5 @@
 import { isNil } from '../common.ts'
-import { CoreBindings, License, SolJson } from '../deps.ts'
+import { type CoreBindings, type License, Reset, type SolJson } from 'solc/types'
 import { bindSolcMethod, bindSolcMethodWithFallbackFunc } from './helpers.ts'
 
 export function setupCore(solJson: SolJson): CoreBindings {
@@ -11,10 +11,13 @@ export function setupCore(solJson: SolJson): CoreBindings {
   }
 
   const helpers = {
+    // @ts-expect-error binding to this
     addFunction: unboundAddFunction.bind(this, solJson),
+    // @ts-expect-error binding to this
     removeFunction: unboundRemoveFunction.bind(this, solJson),
-
+    // @ts-expect-error binding to this
     copyFromCString: unboundCopyFromCString.bind(this, solJson),
+    // @ts-expect-error binding to this
     copyToCString: unboundCopyToCString.bind(this, solJson, core.alloc),
   }
 
@@ -74,7 +77,7 @@ function bindVersion<T>(solJson: SolJson) {
  * @param solJson The Emscripten compiled Solidity object.
  */
 function bindLicense(solJson: SolJson) {
-  return bindSolcMethodWithFallbackFunc<() => License>(
+  return bindSolcMethodWithFallbackFunc<License>(
     solJson,
     'solidity_license',
     'string',
@@ -91,7 +94,7 @@ function bindLicense(solJson: SolJson) {
  * @param solJson The Emscripten compiled Solidity object.
  */
 function bindReset(solJson: SolJson) {
-  return bindSolcMethod(
+  return bindSolcMethod<Reset>(
     solJson,
     'solidity_reset',
     null,
@@ -138,8 +141,7 @@ function unboundCopyToCString(solJson: SolJson, alloc: (n: number) => number, st
  * @param ptr The pointer location where the C string will be referenced.
  */
 function unboundCopyFromCString(solJson: SolJson, ptr: number) {
-  const copyFromCString = solJson.UTF8ToString || solJson.Pointer_stringify
-  return copyFromCString(ptr)
+  return solJson.UTF8ToString(ptr)
 }
 
 function unboundAddFunction(solJson: SolJson, func: (...args: unknown[]) => unknown, signature?: string) {

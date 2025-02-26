@@ -1,5 +1,5 @@
 import { isNil } from '../common.ts'
-import { SolJson } from '../deps.ts'
+import { SolJson } from 'solc/types'
 
 export function bindSolcMethod<T>(
   solJson: SolJson,

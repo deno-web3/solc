@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 
-import { Callbacks, CoreBindings, ReadCallback, SolJson } from '../deps.ts'
 import { isNil } from '../common.ts'
 import { bindSolcMethod } from './helpers.ts'
+import { Callbacks, CoreBindings, ReadCallback, SolJson } from 'solc/types'
 
 export function setupCompile(solJson: SolJson, core: CoreBindings) {
   return {
@@ -73,8 +73,7 @@ function bindCompileJsonCallback(solJson: SolJson, coreBindings: CoreBindings) {
 }
 
 /**
- * Returns a binding to the solidity solidity_compile method with a fallback to
- * compileStandard.
+ * Returns a binding to the solidity solidity_compile method.
  * input (jsontext), callback (optional >= v6 only - ptr) -> output (jsontext)
  *
  * @param solJson The Emscripten compiled Solidity object.
@@ -84,15 +83,6 @@ function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
   let boundFunctionStandard = null
   let boundFunctionSolidity: ((jsontext: string, ptr?: number) => string) | null = null
 
-  // input (jsontext), callback (ptr) -> output (jsontext)
-  const compileInternal = bindSolcMethod<(jsontext: string, ptr?: number) => string>(
-    solJson,
-    'compileStandard',
-    'string',
-    ['string', 'number'],
-    null,
-  )
-
   // input (jsontext), callback (ptr), callback_context (ptr) -> output (jsontext)
   boundFunctionSolidity = bindSolcMethod(
     solJson,
@@ -101,12 +91,6 @@ function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
     ['string', 'number', 'number'],
     null,
   )
-
-  if (!isNil(compileInternal)) {
-    boundFunctionStandard = function (input: string, readCallback: ReadCallback) {
-      return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal, [input])
-    }
-  }
 
   if (!isNil(boundFunctionSolidity)) {
     boundFunctionStandard = function (input: string, callbacks: Callbacks) {
@@ -130,7 +114,8 @@ function wrapCallbackWithKind<Arg extends string>(
   return function (context: 0, kind: string, data: string, contents: string, error: string) {
     // Must be a null pointer.
     assert(context === 0, 'Callback context must be null.')
-    const result = callback(coreBindings.copyFromCString(kind) as Arg, coreBindings.copyFromCString(data) as Arg)
+    console.log({ kind, data })
+    const result = callback(coreBindings.copyFromCString(kind), coreBindings.copyFromCString(data))
     if (typeof result.contents === 'string') {
       coreBindings.copyToCString(result.contents, contents)
     }
