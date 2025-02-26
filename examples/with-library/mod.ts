@@ -4,10 +4,10 @@ import { download } from 'solc/download'
 import { createRequire } from '../../helpers_test.ts'
 import { exists } from '../../helpers_test.ts'
 
-if (!(await exists('./soljson.js'))) await download()
+if (!(await exists('./soljson.cjs'))) await download()
 
 const require = createRequire(import.meta.url)
-const solc = wrapper(require('./soljson.js'))
+const solc = wrapper(require('./soljson.cjs'))
 
 const Example = await Deno.readTextFile('./Example.sol')
 const LibString = await Deno.readTextFile('./LibString.sol')

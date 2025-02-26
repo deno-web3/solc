@@ -129,7 +129,7 @@ export type DocMethods = Record<
   }
 >
 export type GasEstimates = Partial<{
-  creation: { codeDepositCost: string; executionCost: string; totalCost: string }
+  creation: { codeDepositCost: string; executionCost: string; totalCost: string } | string[]
   internal: Record<string, string>
   external: Record<string, string>
 }>
@@ -187,9 +187,10 @@ export type CompiledContract = {
 }
 
 export type Output = {
+  interface: string
   error?: CompilationError
   errors: CompilationError[]
-  contracts: Record<string, Record<string, CompiledContract>>
+  contracts: { gasEstimates?: GasEstimates } & Record<string, Record<string, CompiledContract>>
   sourceList?: string[]
   sources?: Record<string, { id: number; AST?: any }>
 }

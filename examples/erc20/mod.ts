@@ -1,13 +1,13 @@
 import { wrapper } from 'solc'
 import { Input } from 'solc/types'
 import { download } from 'solc/download'
-import { createRequire } from '../../helpers_test.ts'
 import { exists } from '../../helpers_test.ts'
 
-if (!(await exists('./soljson.js'))) await download()
+if (!(await exists('./soljson.cjs'))) await download()
 
-const require = createRequire(import.meta.url)
-const solc = wrapper(require('./soljson.js'))
+const mod = await import('./soljson.cjs')
+
+const solc = wrapper(mod.default)
 
 const MyToken = await Deno.readTextFile('./MyToken.sol')
 const ERC20 = await Deno.readTextFile('./ERC20.sol')

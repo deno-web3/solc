@@ -3,6 +3,9 @@
     "files": {
       "include": ["./**/*.ts"],
       "exclude": ["./**/*.js"]
+    },
+    "rules": {
+      "exclude": ["no-explicit-any"]
     }
   },
   "fmt": {
@@ -15,6 +18,8 @@
     "lineWidth": 120
   },
   "imports": {
+    "@noble/hashes": "npm:@noble/hashes@^1.7.1",
+    "@std/semver": "jsr:@std/semver@^1.0.4",
     "solc": "./mod.ts",
     "solc/download": "./download.ts",
     "solc/types": "./types.ts",

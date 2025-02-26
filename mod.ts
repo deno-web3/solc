@@ -1,9 +1,13 @@
-import { setupBindings } from './bindings.ts'
+import setupBindings from './bindings/index.ts'
 import { CompileBindings, SolJson } from './deps.ts'
 import type { Wrapper } from './types.ts'
 
 function compileStandardWrapper(compile: CompileBindings, inputRaw: string, readCallback: unknown) {
   return compile.compileStandard(inputRaw, readCallback as number)
+}
+
+if (!globalThis.__dirname) {
+  globalThis.__dirname = import.meta.url
 }
 
 /**

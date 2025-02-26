@@ -30,7 +30,7 @@ import { createRequire } from 'node:module'
 // Download latest Solidity compiler
 await download()
 
-const solc = wrapper(createRequire(import.meta.url)('./soljson.js'))
+const solc = wrapper(createRequire(import.meta.url)('./soljson.cjs'))
 
 const MyToken = await Deno.readTextFile('./MyToken.sol')
 const ERC20 = await Deno.readTextFile('./ERC20.sol')

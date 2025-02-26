@@ -1,5 +1,13 @@
 {
-  "version": "3",
+  "version": "4",
+  "specifiers": {
+    "jsr:@std/semver@^1.0.4": "1.0.4"
+  },
+  "jsr": {
+    "@std/semver@1.0.4": {
+      "integrity": "a62af791917d8fd6c48d6ebbb872f83fad3fc6671ffadbbd39ea229c2d34d175"
+    }
+  },
   "remote": {
     "https://deno.land/std@0.221.0/assert/_constants.ts": "a271e8ef5a573f1df8e822a6eb9d09df064ad66a4390f21b3e31f820a38e0975",
     "https://deno.land/std@0.221.0/assert/_diff.ts": "4bf42969aa8b1a33aaf23eb8e478b011bfaa31b82d85d2ff4b5c4662d8780d2b",
@@ -46,5 +54,11 @@
     "https://deno.land/std@0.221.0/testing/_test_suite.ts": "f10a8a6338b60c403f07a76f3f46bdc9f1e1a820c0a1decddeb2949f7a8a0546",
     "https://deno.land/std@0.221.0/testing/bdd.ts": "7a8ac58eded80e6fefa7cf7538927e88781cf5f247c04b35261c3213316e2dd0",
     "https://raw.githubusercontent.com/ethereum/solc-js/540a9643cd7974e329287ebf8d4c2c70d744c11d/common/types.ts": "8ab10911ffceee409aab33f37237dcb1d3207c8ad310c291e2abcb9c7a5f4d2c"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/semver@^1.0.4",
+      "npm:@noble/hashes@^1.7.1"
+    ]
   }
 }

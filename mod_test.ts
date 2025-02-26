@@ -7,6 +7,8 @@ import type { Input, Output, Wrapper } from 'solc/types'
 
 const require = createRequire(import.meta.url)
 
+globalThis.__dirname = import.meta.dirname!
+
 const contract = `
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8;
@@ -19,8 +21,8 @@ contract HelloWorld {
 describe('solc/wrapper.ts', () => {
   let solc: Wrapper
   beforeAll(async () => {
-    await download('./soljson_test.js', '0.8.18')
-    solc = wrapper(require('./soljson_test.js'))
+    await download('./soljson_test.cjs', '0.8.18')
+    solc = wrapper(require('./soljson_test.cjs'))
   })
   it('returns JS interface', () => {
     expect(solc.compile).toBeDefined()
