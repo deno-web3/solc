@@ -111,11 +111,11 @@ function wrapCallbackWithKind<Arg extends string>(
 ) {
   assert(typeof callback === 'function', 'Invalid callback specified.')
 
-  return function (context: 0, kind: string, data: string, contents: string, error: string) {
+  return function (context: 0, kind: number, data: number, contents: number, error: number) {
     // Must be a null pointer.
     assert(context === 0, 'Callback context must be null.')
     console.log({ kind, data })
-    const result = callback(coreBindings.copyFromCString(kind), coreBindings.copyFromCString(data))
+    const result = callback(coreBindings.copyFromCString(kind) as Arg, coreBindings.copyFromCString(data) as Arg)
     if (typeof result.contents === 'string') {
       coreBindings.copyToCString(result.contents, contents)
     }

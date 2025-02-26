@@ -1,4 +1,4 @@
-import { SolJson } from '../deps.ts'
+import { SolJson } from 'solc/types'
 import { setupCompile } from './compile.ts'
 import { setupCore } from './core.ts'
 import { getSupportedMethods } from './helpers.ts'
@@ -12,9 +12,7 @@ export default function setupBindings(solJson: SolJson) {
 
   return {
     methodFlags,
-
     coreBindings,
-
     compileBindings,
   }
 }

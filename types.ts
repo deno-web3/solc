@@ -181,14 +181,6 @@ export interface SolJson {
    * @param funcPtr
    */
   removeFunction(funcPtr: number): void
-
-  /**
-   * Fallback runtime which can contain the add/remove functions
-   */
-  Runtime: {
-    addFunction(func: (...args: any[]) => any, signature?: string): number
-    removeFunction(funcPtr: number): void
-  }
 }
 
 /**************************

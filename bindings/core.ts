@@ -1,10 +1,10 @@
 import { isNil } from '../common.ts'
-import { type CoreBindings, type License, Reset, type SolJson } from 'solc/types'
+import { Alloc, type CoreBindings, type License, Reset, type SolJson } from 'solc/types'
 import { bindSolcMethod, bindSolcMethodWithFallbackFunc } from './helpers.ts'
 
 export function setupCore(solJson: SolJson): CoreBindings {
   const core = {
-    alloc: bindAlloc<(n: number) => number>(solJson),
+    alloc: bindAlloc(solJson),
     license: bindLicense(solJson),
     version: bindVersion<() => string>(solJson),
     reset: bindReset(solJson),
@@ -36,8 +36,8 @@ export function setupCore(solJson: SolJson): CoreBindings {
  *
  * @param solJson The Emscripten compiled Solidity object.
  */
-function bindAlloc<T>(solJson: SolJson) {
-  const allocBinding = bindSolcMethod<T>(
+function bindAlloc(solJson: SolJson) {
+  const allocBinding = bindSolcMethod<Alloc>(
     solJson,
     'solidity_alloc',
     'number',
@@ -124,13 +124,15 @@ function bindReset(solJson: SolJson) {
  * @param str The source string being copied to a C string.
  * @param ptr The pointer location where the C string will be set.
  */
-function unboundCopyToCString(solJson: SolJson, alloc: (n: number) => number, str: string, ptr: number) {
+function unboundCopyToCString(solJson: SolJson, alloc: Alloc, str: string, ptr: number) {
   const length = solJson.lengthBytesUTF8(str)
 
   const buffer = alloc(length + 1)
 
   solJson.stringToUTF8(str, buffer, length + 1)
   solJson.setValue(ptr, buffer, '*')
+
+  return str
 }
 
 /**
@@ -145,9 +147,9 @@ function unboundCopyFromCString(solJson: SolJson, ptr: number) {
 }
 
 function unboundAddFunction(solJson: SolJson, func: (...args: unknown[]) => unknown, signature?: string) {
-  return (solJson.addFunction || solJson.Runtime.addFunction)(func, signature)
+  return solJson.addFunction(func, signature)
 }
 
 function unboundRemoveFunction(solJson: SolJson, ptr: number) {
-  return (solJson.removeFunction || solJson.Runtime.removeFunction)(ptr)
+  return solJson.removeFunction(ptr)
 }
