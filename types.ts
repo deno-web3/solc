@@ -351,3 +351,152 @@ export interface Wrapper {
 
   setupMethods(soljson: SolJson): Wrapper
 }
+
+export interface Input {
+  language: 'Solidity' | 'Yul'
+  sources: { [contractName: string]: { content: string } }
+  settings?: {
+    outputSelection?: { '*'?: { '*'?: string[] } }
+    optimizer?: {
+      enabled?: boolean
+      runs?: number
+    }
+    evmVersion?: string
+    libraries?: { [libraryName: string]: string }
+    remappings?: string[]
+  }
+}
+
+interface ContractABI {
+  inputs: { internalType: string; name: string; type: string; indexed?: boolean }[]
+  name: string
+  outputs: { internalType: string; name: string; type: string }[]
+  stateMutability: string
+  type: string
+}
+
+interface DevDoc {
+  kind: 'dev'
+  methods: Record<string, any>
+  version: number
+  details: string
+}
+
+interface UserDoc {
+  kind: 'user'
+  methods: Record<string, any>
+  version: number
+}
+
+interface AST {
+  nativeSrc: string
+  nodeType: string
+  src: string
+  statements: { body?: AST; name: string; nativeSrc: string; nodeType: string }[]
+}
+
+interface GeneratedSource {
+  ast: AST
+  contents: string
+  id: number
+  language: 'Yul'
+  name: `${string}.yul`
+}
+
+interface Bytecode {
+  linkReferences: LinkReferences
+  object: string
+  generatedSources: GeneratedSource[]
+}
+
+interface GasEstimates {
+  creation: {
+    codeDepositCost: string
+    executionCost: string
+    totalCost: string
+  }
+  external: {
+    [functionName: string]: string
+  }
+}
+
+interface LegacyAssemblyItem {
+  begin: number
+  end: number
+  name: string
+  source: number
+  value: string
+}
+
+interface LegacyAssembly {
+  '.code': LegacyAssemblyItem[]
+  '.data': {
+    '0': {
+      '.auxdata': string
+      '.code': LegacyAssemblyItem[]
+    }
+  }
+  sourceList: string[]
+}
+
+interface EVM {
+  assembly: string
+  bytecode: Bytecode
+  deployedBytecode: Bytecode
+  gasEstimates: GasEstimates
+  legacyAssembly: LegacyAssembly
+  methodIdentifiers: Record<string, string>
+}
+
+interface Ewasm {
+  wasm: string
+}
+
+interface StorageItem {
+  astId: number
+  contract: string
+  label: string
+  offset: number
+  slot: string
+  type: string
+}
+
+interface StorageType {
+  encoding: string
+  label: string
+  numberOfBytes: string
+}
+
+interface StorageLayout {
+  storage: StorageItem[]
+  types: Record<string, StorageType>
+}
+
+interface Contract {
+  abi: ContractABI[]
+  devdoc: DevDoc
+  evm: EVM
+  ewasm: Ewasm
+  metadata: string
+  storageLayout: StorageLayout
+  transientStorageLayout?: StorageLayout
+  userdoc: UserDoc
+}
+
+interface Contracts {
+  [contractName: string]: {
+    [contractInstance: string]: Contract
+  }
+}
+
+interface Sources {
+  [sourceName: string]: {
+    id: number
+  }
+}
+
+export interface Output {
+  sources: Sources
+  contracts: Contracts
+  errors: unknown[]
+}

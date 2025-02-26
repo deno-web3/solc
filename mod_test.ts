@@ -44,6 +44,7 @@ describe('solc/wrapper.ts', () => {
       },
     }
     const output: Output = JSON.parse(solc.compile(JSON.stringify(input)))
+
     expect(output.sources!['Hello.sol'].id).toEqual(0)
     expect(output.contracts!['Hello.sol']['HelloWorld'].abi).toEqual([
       {
