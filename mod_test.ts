@@ -18,7 +18,7 @@ contract HelloWorld {
 }
 `
 
-describe('solc/wrapper.ts', () => {
+describe('Wrapper', () => {
   let solc: Wrapper
   beforeAll(async () => {
     await download('./soljson_test.cjs', '0.8.18')

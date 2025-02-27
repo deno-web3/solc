@@ -45,12 +45,6 @@ function bindAlloc(solJson: SolJson) {
     null,
   )
 
-  // the fallback malloc is not a cwrap function and should just be returned
-  // directly in-case the alloc binding could not happen.
-  if (isNil(allocBinding)) {
-    return solJson._malloc
-  }
-
   return allocBinding
 }
 
