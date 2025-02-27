@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 
 import { bindSolcMethod } from './helpers.ts'
-import { Callbacks, CompileBindings, CompileJsonStandard, CoreBindings, ReadCallback, SolJson } from 'solc/types'
+import type { Callbacks, CompileBindings, CompileJsonStandard, CoreBindings, ReadCallback, SolJson } from 'solc/types'
 
 export function setupCompile(solJson: SolJson, core: CoreBindings): CompileBindings {
   return {

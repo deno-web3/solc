@@ -5,7 +5,7 @@ import { copy, readerFromStreamReader } from './deps.ts'
  * @param path download destination
  * @param version compiler version. if not specified, latest is downloaded
  */
-export const download = async (path = './soljson.cjs', version?: string) => {
+export const download = async (path = './soljson.cjs', version?: string): Promise<string> => {
   console.log(`Fetching releases...`)
   const { releases, latestRelease } =
     (await fetch('https://binaries.soliditylang.org/emscripten-wasm32/list.json').then((res) => res.json())) as {

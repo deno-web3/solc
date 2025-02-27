@@ -1,5 +1,4 @@
-import { isNil } from '../common.ts'
-import { Alloc, type CoreBindings, type License, Reset, type SolJson } from 'solc/types'
+import type { Alloc, CoreBindings, License, Reset, SolJson } from 'solc/types'
 import { bindSolcMethod, bindSolcMethodWithFallbackFunc } from './helpers.ts'
 
 export function setupCore(solJson: SolJson): CoreBindings {

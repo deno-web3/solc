@@ -73,7 +73,7 @@ export interface SolJson {
    * used in SAFE_HEAP compilation mode, where it can help avoid infinite recursion
    * in some specialist use cases.
    */
-  setValue(ptr: number, value: any, type: string, noSafe?: boolean): void
+  setValue(ptr: number, value: unknown, type: string, noSafe?: boolean): void
 
   /**
    * Given a pointer ptr to a null-terminated UTF8-encoded string in the
@@ -173,14 +173,14 @@ export interface SolJson {
    * @param func
    * @param signature
    */
-  addFunction(func: (...args: any[]) => any, signature?: string): number
+  addFunction: CoreBindings['addFunction']
 
   /**
    * Removes an allocated function by the provided function pointer.
    *
    * @param funcPtr
    */
-  removeFunction(funcPtr: number): void
+  removeFunction: CoreBindings['removeFunction']
 }
 
 /**************************
@@ -257,7 +257,7 @@ export interface CoreBindings {
   copyFromCString: (ptr: number) => string
   copyToCString: (input: string, ptr: number) => string
 
-  addFunction: (func: (...args: any[]) => any, signature: string) => number
+  addFunction: <Func extends (...args: any[]) => any>(func: Func, signature?: string) => number
   removeFunction: (ptr: number) => void
 }
 

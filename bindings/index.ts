@@ -1,4 +1,4 @@
-import { SolJson } from 'solc/types'
+import type { SolJson } from 'solc/types'
 import { setupCompile } from './compile.ts'
 import { setupCore } from './core.ts'
 import { getSupportedMethods } from './helpers.ts'
