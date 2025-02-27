@@ -33,5 +33,9 @@
   "name": "@deno-web3/solc",
   "version": "3.0.0",
   "license": "MIT",
-  "exports": "./mod.ts"
+  "exports": {
+    "./": "./mod.ts",
+    "./download": "./download.ts",
+    "./types": "./types.ts"
+  }
 }

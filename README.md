@@ -23,8 +23,8 @@ See [solc-js README](https://github.com/ethereum/solc-js#readme) and [Deno doc](
 
 ```ts
 import { wrapper } from '@deno-web3/solc'
-import { Input } from '@deno-web3/solc/types.ts'
-import { download } from '@deno-web3/solc/download.ts'
+import { Input } from '@deno-web3/solc/types'
+import { download } from '@deno-web3/solc/download'
 import { createRequire } from 'node:module'
 
 // Download latest Solidity compiler
