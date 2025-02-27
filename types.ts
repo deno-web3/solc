@@ -257,7 +257,7 @@ export interface CoreBindings {
   copyFromCString: (ptr: number) => string
   copyToCString: (input: string, ptr: number) => string
 
-  addFunction: <Func extends (...args: any[]) => any>(func: Func, signature?: string) => number
+  addFunction: <Func extends (...args: any[]) => void>(func: Func, signature?: string) => number
   removeFunction: (ptr: number) => void
 }
 
