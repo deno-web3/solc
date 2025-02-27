@@ -2,9 +2,17 @@ import assert from 'node:assert'
 
 import { isNil } from '../common.ts'
 import { bindSolcMethod } from './helpers.ts'
-import { Callbacks, CoreBindings, ReadCallback, SolJson } from 'solc/types'
+import {
+  Callbacks,
+  CompileBindings,
+  CompileJson,
+  CompileJsonCallback,
+  CoreBindings,
+  ReadCallback,
+  SolJson,
+} from 'solc/types'
 
-export function setupCompile(solJson: SolJson, core: CoreBindings) {
+export function setupCompile(solJson: SolJson, core: CoreBindings): CompileBindings {
   return {
     compileJson: bindCompileJson(solJson),
     compileJsonCallback: bindCompileJsonCallback(solJson, core),
@@ -23,7 +31,7 @@ export function setupCompile(solJson: SolJson, core: CoreBindings) {
  *
  * @param solJson The Emscripten compiled Solidity object.
  */
-function bindCompileJson(solJson: SolJson) {
+const bindCompileJson = (solJson: SolJson): CompileJson => {
   return bindSolcMethod(
     solJson,
     'compileJSON',
@@ -39,7 +47,7 @@ function bindCompileJson(solJson: SolJson) {
  *
  * @param solJson The Emscripten compiled Solidity object.
  */
-function bindCompileJsonMulti(solJson: SolJson) {
+function bindCompileJsonMulti(solJson: SolJson): CompileMulti {
   return bindSolcMethod(
     solJson,
     'compileJSONMulti',
@@ -56,7 +64,7 @@ function bindCompileJsonMulti(solJson: SolJson) {
  * @param solJson The Emscripten compiled Solidity object.
  * @param coreBindings The core bound Solidity methods.
  */
-function bindCompileJsonCallback(solJson: SolJson, coreBindings: CoreBindings) {
+function bindCompileJsonCallback(solJson: SolJson, coreBindings: CoreBindings): CompileJsonCallback {
   const compileInternal = bindSolcMethod<(arg0: string, arg1: number, arg2?: number) => string>(
     solJson,
     'compileJSONCallback',
@@ -67,7 +75,7 @@ function bindCompileJsonCallback(solJson: SolJson, coreBindings: CoreBindings) {
 
   if (isNil(compileInternal)) return null
 
-  return function (input: string, optimize: number, readCallback: ReadCallback) {
+  return function (input: string, optimize: boolean, readCallback: ReadCallback) {
     return runWithCallbacks(solJson, coreBindings, readCallback, compileInternal, [input, optimize])
   }
 }
@@ -79,7 +87,7 @@ function bindCompileJsonCallback(solJson: SolJson, coreBindings: CoreBindings) {
  * @param solJson The Emscripten compiled Solidity object.
  * @param coreBindings The core bound Solidity methods.
  */
-function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings) {
+function bindCompileStandard(solJson: SolJson, coreBindings: CoreBindings): CompileStandard {
   let boundFunctionStandard = null
   let boundFunctionSolidity: ((jsontext: string, ptr?: number) => string) | null = null
 

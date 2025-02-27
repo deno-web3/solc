@@ -320,11 +320,6 @@ export interface Wrapper {
   version(): string
 
   /**
-   * Returns the compiler version as a semver version style.
-   */
-  semver(): string
-
-  /**
    * Compile the provided input, using the best case implementation based on the
    * current binary.
    *
@@ -346,8 +341,6 @@ export interface Wrapper {
     importCallback: boolean
     nativeStandardJSON: boolean
   }
-
-  loadRemoteVersion(version: string, callback: (error?: Error, solc?: SolJson) => void): void
 
   setupMethods(soljson: SolJson): Wrapper
 }
