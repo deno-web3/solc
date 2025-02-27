@@ -1,5 +1,5 @@
 import { wrapper } from 'solc'
-import { Input } from 'solc/types'
+import type { Input } from 'solc/types'
 import { download } from 'solc/download'
 import { exists } from '../../helpers_test.ts'
 
