@@ -318,14 +318,14 @@ interface ContractABI {
 
 interface DevDoc {
   kind: 'dev'
-  methods: Record<string, any>
+  methods: Record<string, unknown>
   version: number
   details: string
 }
 
 interface UserDoc {
   kind: 'user'
-  methods: Record<string, any>
+  methods: Record<string, unknown>
   version: number
 }
 

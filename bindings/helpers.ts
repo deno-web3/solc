@@ -1,5 +1,5 @@
 import { isNil } from '../common.ts'
-import { SolJson } from 'solc/types'
+import type { SolJson } from 'solc/types'
 
 export function bindSolcMethod<T>(
   solJson: SolJson,
@@ -8,7 +8,7 @@ export function bindSolcMethod<T>(
   args: string[],
   defaultValue?: unknown,
 ): T {
-  if (isNil((solJson as any)[`_${method}`]) && defaultValue !== undefined) {
+  if (isNil(solJson[`_${method}` as keyof typeof solJson]) && defaultValue !== undefined) {
     return defaultValue as T
   }
 
@@ -43,5 +43,5 @@ export function getSupportedMethods(solJson: SolJson) {
 }
 
 function anyMethodExists(solJson: SolJson, ...names: string[]) {
-  return names.some((name) => !isNil((solJson as any)[`_${name}`]))
+  return names.some((name) => !isNil(solJson[`_${name}` as keyof typeof solJson]))
 }

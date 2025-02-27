@@ -1,5 +1,5 @@
 import { wrapper } from 'solc'
-import type { Input } from 'solc/types'
+import type { Input, Output } from 'solc/types'
 import { download } from 'solc/download'
 import { exists } from '../../helpers_test.ts'
 
@@ -31,6 +31,6 @@ const input: Input = {
   },
 }
 
-const result = JSON.parse(solc.compile(JSON.stringify(input)))
+const result = JSON.parse(solc.compile(JSON.stringify(input))) as Output
 
 console.log(result)
