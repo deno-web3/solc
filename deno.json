@@ -34,7 +34,7 @@
   "version": "3.0.0",
   "license": "MIT",
   "exports": {
-    "./": "./mod.ts",
+    ".": "./mod.ts",
     "./download": "./download.ts",
     "./types": "./types.ts"
   }
