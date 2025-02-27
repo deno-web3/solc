@@ -224,39 +224,6 @@ export type ReadCallback = (path: string) => ReadCallbackResult
 export type Callbacks = { [x: string]: ReadCallback }
 
 /**
- * Compile a single file.
- *
- * @solidityMaxVersion 0.5.0
- *
- * @param input
- * @param optimize
- */
-export type CompileJson = (input: string, optimize: boolean) => string
-
-/**
- * Compile a single file with a callback.
- *
- * @solidityMinVersion 0.2.1
- * @solidityMaxVersion 0.5.0
- *
- * @param input
- * @param optimize
- * @param readCallbackPtr
- */
-export type CompileJsonCallback = (input: string, optimize: boolean, readCallbackPtr: number) => string
-
-/**
- *  Compile multiple files.
- *
- * @solidityMinVersion 0.1.6
- * @solidityMaxVersion 0.5.0
- *
- * @param input
- * @param optimize
- */
-export type CompileJsonMulti = (input: string, optimize: boolean) => string
-
-/**
  * Will attempt to bind into compileStandard before falling back to solidity_compile.
  * compileStandard - solidityMaxVersion 0.5.0
  *
@@ -278,9 +245,6 @@ export type CompileJsonStandard = (input: string, callbackPtr: number, contextPt
 export type CompileSolidity = (input: string, readCallback?: Callbacks) => string
 
 export interface CompileBindings {
-  compileJson: CompileJson
-  compileJsonCallback: CompileJsonCallback
-  compileJsonMulti: CompileJsonMulti
   compileStandard: CompileJsonStandard
 }
 
@@ -327,22 +291,6 @@ export interface Wrapper {
    * @param readCallback
    */
   compile(input: string, readCallback?: Callbacks): string
-
-  lowlevel: {
-    compileSingle?: CompileJson
-    compileMulti?: CompileJsonMulti
-    compileCallback?: CompileJsonCallback
-    compileStandard?: CompileJsonStandard
-  }
-
-  features: {
-    legacySingleInput: boolean
-    multipleInputs: boolean
-    importCallback: boolean
-    nativeStandardJSON: boolean
-  }
-
-  setupMethods(soljson: SolJson): Wrapper
 }
 
 export interface Input {

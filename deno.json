@@ -1,9 +1,7 @@
 {
   "lint": {
-    "files": {
-      "include": ["./**/*.ts"],
-      "exclude": ["./**/*.js"]
-    },
+    "include": ["./**/*.ts"],
+    "exclude": ["./**/*.js"],
     "rules": {
       "exclude": ["no-explicit-any"]
     }
