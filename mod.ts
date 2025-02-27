@@ -1,6 +1,5 @@
-import { setupBindings } from './bindings.ts'
-import { CompileBindings, SolJson } from './deps.ts'
-import type { Wrapper } from './types.ts'
+import setupBindings from './bindings/index.ts'
+import type { CompileBindings, SolJson, Wrapper } from 'solc/types'
 
 function compileStandardWrapper(compile: CompileBindings, inputRaw: string, readCallback: unknown) {
   return compile.compileStandard(inputRaw, readCallback as number)
@@ -18,6 +17,5 @@ export function wrapper(soljson: SolJson): Wrapper {
     license: coreBindings.license,
     // @ts-ignore this stuff
     compile: compileStandardWrapper.bind(this, compileBindings),
-    loadRemoteVersion: () => void 0,
   }
 }

@@ -1,11 +1,13 @@
-import { beforeAll, describe, it } from 'https://deno.land/std@0.221.0/testing/bdd.ts'
-import { expect } from 'https://deno.land/std@0.221.0/expect/mod.ts'
+import { beforeAll, describe, it } from '@std/testing/bdd'
+import { expect } from '@std/expect'
 import { wrapper } from 'solc'
 import { createRequire } from './helpers_test.ts'
 import { download } from 'solc/download'
 import type { Input, Output, Wrapper } from 'solc/types'
 
 const require = createRequire(import.meta.url)
+
+globalThis.__dirname = import.meta.dirname!
 
 const contract = `
 // SPDX-License-Identifier: MIT
@@ -16,11 +18,11 @@ contract HelloWorld {
 }
 `
 
-describe('solc/wrapper.ts', () => {
+describe('Wrapper', () => {
   let solc: Wrapper
   beforeAll(async () => {
-    await download('./soljson_test.js', '0.8.18')
-    solc = wrapper(require('./soljson_test.js'))
+    await download('./soljson_test.cjs', '0.8.18')
+    solc = wrapper(require('./soljson_test.cjs'))
   })
   it('returns JS interface', () => {
     expect(solc.compile).toBeDefined()
@@ -42,6 +44,7 @@ describe('solc/wrapper.ts', () => {
       },
     }
     const output: Output = JSON.parse(solc.compile(JSON.stringify(input)))
+
     expect(output.sources!['Hello.sol'].id).toEqual(0)
     expect(output.contracts!['Hello.sol']['HelloWorld'].abi).toEqual([
       {

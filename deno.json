@@ -1,8 +1,9 @@
 {
   "lint": {
-    "files": {
-      "include": ["./**/*.ts"],
-      "exclude": ["./**/*.js"]
+    "include": ["./**/*.ts"],
+    "exclude": ["./**/*.js"],
+    "rules": {
+      "exclude": ["no-explicit-any"]
     }
   },
   "fmt": {
@@ -15,10 +16,12 @@
     "lineWidth": 120
   },
   "imports": {
+    "@std/expect": "jsr:@std/expect@^1.0.13",
+    "@std/io": "jsr:@std/io@^0.225.2",
+    "@std/testing": "jsr:@std/testing@^1.0.9",
     "solc": "./mod.ts",
     "solc/download": "./download.ts",
-    "solc/types": "./types.ts",
-    "solc/url_resolver": "./url_resolver.ts"
+    "solc/types": "./types.ts"
   },
   "test": {
     "exclude": ["./**/*.js", "examples"]
@@ -26,5 +29,13 @@
   "tasks": {
     "test": "deno test --no-check --allow-net --allow-read --allow-write --coverage=coverage",
     "cov": "deno coverage coverage --lcov > coverage.lcov"
+  },
+  "name": "@deno-web3/solc",
+  "version": "3.0.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./download": "./download.ts",
+    "./types": "./types.ts"
   }
 }

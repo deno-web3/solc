@@ -12,18 +12,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
           restore-keys: ${{ runner.os }}-deno-
           path: /home/runner/.cache/deno/deps/https/deno.land
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: fetch any uncached dependencies
         run: |
