@@ -18,6 +18,72 @@ contract HelloWorld {
 }
 `
 
+const interfaceContract = `
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8;
+
+interface IERC20 {
+    function transfer(address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
+`
+
+const abstractContract = `
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8;
+
+import "./IERC20.sol";
+
+abstract contract Token is IERC20 {
+    mapping(address => uint256) internal _balances;
+    
+    function balanceOf(address account) external view override returns (uint256) {
+        return _balances[account];
+    }
+    
+    function _mint(address to, uint256 amount) internal {
+        _balances[to] += amount;
+    }
+}
+`
+
+const implementationContract = `
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8;
+
+import "./Token.sol";
+
+contract MyToken is Token {
+    string public name = "MyToken";
+    
+    constructor() {
+        _mint(msg.sender, 1000000);
+    }
+    
+    function transfer(address to, uint256 amount) external override returns (bool) {
+        require(_balances[msg.sender] >= amount, "Insufficient balance");
+        _balances[msg.sender] -= amount;
+        _balances[to] += amount;
+        return true;
+    }
+}
+`
+
+const errorContract = `
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8;
+
+contract ErrorContract {
+    // This will cause a compilation error - missing semicolon
+    string public name = "test"
+    
+    function test() public {
+        // This will cause another error - undefined variable
+        undefinedVariable = 5;
+    }
+}
+`
+
 describe('Wrapper', () => {
   let solc: Wrapper
   beforeAll(async () => {
@@ -55,5 +121,92 @@ describe('Wrapper', () => {
         type: 'function',
       },
     ])
+  })
+
+  it('compiles multiple files with inheritance (interface + abstract + implementation)', () => {
+    const input: Input = {
+      language: 'Solidity',
+      sources: {
+        'IERC20.sol': { content: interfaceContract },
+        'Token.sol': { content: abstractContract },
+        'MyToken.sol': { content: implementationContract },
+      },
+      settings: {
+        outputSelection: {
+          '*': {
+            '*': ['*'],
+          },
+        },
+      },
+    }
+    const output: Output = JSON.parse(solc.compile(JSON.stringify(input)))
+
+    // Verify all files are compiled (order may vary)
+    expect(output.sources!['IERC20.sol']).toBeDefined()
+    expect(output.sources!['Token.sol']).toBeDefined() 
+    expect(output.sources!['MyToken.sol']).toBeDefined()
+
+    // Verify interface contract
+    expect(output.contracts!['IERC20.sol']['IERC20']).toBeDefined()
+    expect(output.contracts!['IERC20.sol']['IERC20'].abi).toEqual([
+      {
+        inputs: [
+          { internalType: 'address', name: 'account', type: 'address' }
+        ],
+        name: 'balanceOf',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: 'to', type: 'address' },
+          { internalType: 'uint256', name: 'amount', type: 'uint256' }
+        ],
+        name: 'transfer',
+        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ])
+
+    // Verify abstract contract exists but has no bytecode (since it's abstract)
+    expect(output.contracts!['Token.sol']['Token']).toBeDefined()
+
+    // Verify implementation contract
+    expect(output.contracts!['MyToken.sol']['MyToken']).toBeDefined()
+    expect(output.contracts!['MyToken.sol']['MyToken'].evm.bytecode.object).not.toBe('')
+    
+    // Check that MyToken has the expected ABI including inherited functions
+    const myTokenAbi = output.contracts!['MyToken.sol']['MyToken'].abi
+    const functionNames = myTokenAbi.map(item => item.name).filter(name => name)
+    expect(functionNames).toContain('transfer')
+    expect(functionNames).toContain('balanceOf')
+    expect(functionNames).toContain('name')
+  })
+
+  it('handles compilation errors properly', () => {
+    const input: Input = {
+      language: 'Solidity',
+      sources: {
+        'Error.sol': { content: errorContract },
+      },
+      settings: {
+        outputSelection: {
+          '*': {
+            '*': ['*'],
+          },
+        },
+      },
+    }
+    const output: Output = JSON.parse(solc.compile(JSON.stringify(input)))
+
+    // Should have compilation errors
+    expect(output.errors).toBeDefined()
+    expect(output.errors!.length).toBeGreaterThan(0)
+    
+    // Check that errors contain expected information
+    const errorMessages = output.errors!.map((error: any) => error.message || error.formattedMessage || '').join(' ')
+    expect(errorMessages.toLowerCase()).toMatch(/(error|expected|syntax)/)
   })
 })
